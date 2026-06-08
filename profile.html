@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoSwap — My Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1a7a4a; --green-light: #25a863;
+      --green-pale: #e8f5ee; --green-mid: #b8dfc8;
+      --cream: #f9f6f0; --dark: #0f1f14;
+      --text: #1c2e20; --muted: #5a7a63;
+      --white: #ffffff;
+      --card-shadow: 0 4px 24px rgba(26,122,74,0.10);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+    nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 68px; background: rgba(249,246,240,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--green-mid); }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--green); text-decoration: none; }
+    .nav-logo span { color: var(--green-light); }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { text-decoration: none; color: var(--text); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--green); }
+    .nav-cta { display: flex; gap: 12px; }
+    .btn-outline { padding: 8px 20px; border-radius: 8px; border: 1.5px solid var(--green); color: var(--green); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-outline:hover { background: var(--green-pale); }
+    .btn-primary { padding: 8px 20px; border-radius: 8px; background: var(--green); color: var(--white); border: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--green-light); }
+
+    /* PROFILE HEADER */
+    .profile-banner { background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%); height: 180px; position: relative; }
+    .profile-header { padding: 0 5% 32px; background: var(--white); border-bottom: 1px solid var(--green-mid); }
+    .avatar-wrap { position: relative; display: inline-block; margin-top: -56px; margin-bottom: 16px; }
+    .avatar { width: 112px; height: 112px; border-radius: 50%; background: var(--green); border: 4px solid var(--white); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 2.4rem; font-weight: 800; color: var(--white); box-shadow: var(--card-shadow); }
+    .avatar-edit { position: absolute; bottom: 4px; right: 4px; width: 30px; height: 30px; border-radius: 50%; background: var(--green); border: 2px solid var(--white); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.75rem; color: var(--white); }
+    .profile-info { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
+    .profile-info-left h1 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
+    .profile-info-left p { font-size: 0.9rem; color: var(--muted); margin-bottom: 10px; }
+    .profile-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .profile-tag { padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 500; background: var(--green-pale); color: var(--green); border: 1px solid var(--green-mid); }
+    .profile-stats { display: flex; gap: 28px; }
+    .p-stat { text-align: center; }
+    .p-stat strong { display: block; font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--dark); }
+    .p-stat span { font-size: 0.78rem; color: var(--muted); }
+
+    /* MAIN LAYOUT */
+    .profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: 28px; padding: 32px 5%; max-width: 1200px; margin: 0 auto; }
+
+    /* LEFT SIDEBAR */
+    .profile-sidebar {}
+    .sidebar-card { background: var(--white); border-radius: 16px; border: 1px solid var(--green-mid); padding: 20px; box-shadow: var(--card-shadow); margin-bottom: 20px; }
+    .sidebar-card h3 { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--dark); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; color: var(--text); margin-bottom: 4px; border: none; background: transparent; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; text-decoration: none; }
+    .nav-item:hover, .nav-item.active { background: var(--green-pale); color: var(--green); }
+    .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .nav-item .nav-badge { margin-left: auto; background: var(--green); color: var(--white); font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+
+    /* IMPACT CARD */
+    .impact-card { background: var(--green); border-radius: 16px; padding: 20px; color: var(--white); }
+    .impact-card h3 { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; margin-bottom: 16px; opacity: 0.9; }
+    .impact-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .impact-item span { font-size: 0.85rem; opacity: 0.85; }
+    .impact-item strong { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; }
+    .impact-bar { height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; margin-bottom: 16px; overflow: hidden; }
+    .impact-bar-fill { height: 100%; background: rgba(255,255,255,0.7); border-radius: 3px; }
+
+    /* MAIN CONTENT */
+    .profile-main {}
+    .tabs { display: flex; gap: 4px; background: var(--white); border-radius: 12px; padding: 4px; border: 1px solid var(--green-mid); margin-bottom: 24px; box-shadow: var(--card-shadow); }
+    .tab { flex: 1; padding: 10px; border-radius: 8px; border: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+    .tab.active { background: var(--green); color: var(--white); font-weight: 600; }
+    .tab:hover:not(.active) { background: var(--green-pale); color: var(--green); }
+
+    /* TAB CONTENT */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* LISTINGS GRID */
+    .my-listings-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .my-listing-card { background: var(--white); border-radius: 14px; overflow: hidden; border: 1px solid var(--green-mid); box-shadow: var(--card-shadow); transition: transform 0.2s; }
+    .my-listing-card:hover { transform: translateY(-3px); }
+    .my-listing-img { height: 120px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 2.8rem; position: relative; }
+    .listing-status { position: absolute; top: 8px; right: 8px; padding: 3px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; }
+    .status-active { background: var(--green-pale); color: var(--green); border: 1px solid var(--green-mid); }
+    .status-pending { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+    .status-sold { background: #f3e5f5; color: #7b1fa2; border: 1px solid #ce93d8; }
+    .my-listing-body { padding: 12px; }
+    .my-listing-body h4 { font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .my-listing-body p { font-size: 0.75rem; color: var(--muted); margin-bottom: 10px; }
+    .listing-actions { display: flex; gap: 6px; }
+    .action-btn { flex: 1; padding: 6px; border-radius: 6px; border: 1px solid var(--green-mid); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.75rem; color: var(--muted); cursor: pointer; transition: all 0.2s; text-align: center; }
+    .action-btn:hover { background: var(--green-pale); color: var(--green); border-color: var(--green); }
+    .action-btn.danger:hover { background: #fdecea; color: #c62828; border-color: #ef9a9a; }
+
+    /* SWAP HISTORY */
+    .history-list { display: flex; flex-direction: column; gap: 12px; }
+    .history-item { background: var(--white); border-radius: 14px; border: 1px solid var(--green-mid); padding: 16px; display: flex; gap: 16px; align-items: center; box-shadow: var(--card-shadow); }
+    .history-icons { display: flex; align-items: center; gap: 8px; }
+    .h-icon { width: 48px; height: 48px; border-radius: 10px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+    .h-arrow { font-size: 1.2rem; color: var(--green); }
+    .history-info { flex: 1; }
+    .history-info h4 { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+    .history-info p { font-size: 0.8rem; color: var(--muted); }
+    .history-status { padding: 5px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; flex-shrink: 0; }
+    .hs-completed { background: var(--green-pale); color: var(--green); }
+    .hs-pending { background: #fff3e0; color: #e65100; }
+
+    /* EDIT PROFILE FORM */
+    .edit-form { background: var(--white); border-radius: 16px; border: 1px solid var(--green-mid); padding: 28px; box-shadow: var(--card-shadow); }
+    .edit-form h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--green-mid); }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 14px; border: 1.5px solid var(--green-mid); border-radius: 10px; outline: none; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--text); background: var(--cream); transition: border-color 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green); background: var(--white); }
+    .form-group textarea { min-height: 90px; resize: vertical; }
+    .save-btn { padding: 12px 32px; background: var(--green); color: var(--white); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .save-btn:hover { background: var(--green-light); }
+
+    @media (max-width: 900px) { .profile-layout { grid-template-columns: 1fr; } .profile-sidebar { display: none; } .my-listings-grid { grid-template-columns: repeat(2,1fr); } .nav-links { display: none; } }
+    @media (max-width: 480px) { .my-listings-grid { grid-template-columns: 1fr; } .profile-stats { gap: 16px; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Eco<span>Swap</span></a>
+  <div class="nav-links">
+    <a href="browse.html">Browse</a>
+    <a href="map.html">Map</a>
+    <a href="post.html">Post Item</a>
+    <a href="about.html">About</a>
+  </div>
+  <div class="nav-cta">
+    <a href="requests.html" class="btn-outline">Requests</a>
+    <a href="dashboard.html" class="btn-primary">Dashboard</a>
+  </div>
+</nav>
+
+<!-- BANNER -->
+<div class="profile-banner"></div>
+
+<div class="profile-header">
+  <div class="avatar-wrap">
+    <div class="avatar">B</div>
+    <div class="avatar-edit">✏️</div>
+  </div>
+  <div class="profile-info">
+    <div class="profile-info-left">
+      <h1>Bashiir Ahmed</h1>
+      <p>📍 Muar, Johor &nbsp;·&nbsp; Member since January 2025</p>
+      <div class="profile-tags">
+        <span class="profile-tag">✅ Verified</span>
+        <span class="profile-tag">⭐ Top Swapper</span>
+        <span class="profile-tag">🌱 Eco Contributor</span>
+      </div>
+    </div>
+    <div class="profile-stats">
+      <div class="p-stat"><strong>8</strong><span>Listings</span></div>
+      <div class="p-stat"><strong>12</strong><span>Swaps</span></div>
+      <div class="p-stat"><strong>4.9</strong><span>Rating</span></div>
+      <div class="p-stat"><strong>3</strong><span>Pending</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="profile-layout">
+  <!-- LEFT SIDEBAR -->
+  <aside class="profile-sidebar">
+    <div class="sidebar-card">
+      <h3>My Account</h3>
+      <a href="#" class="nav-item active" onclick="switchTab('listings',this)">
+        <span class="nav-icon">📦</span> My Listings <span class="nav-badge">8</span>
+      </a>
+      <a href="#" class="nav-item" onclick="switchTab('history',this)">
+        <span class="nav-icon">🔄</span> Swap History
+      </a>
+      <a href="requests.html" class="nav-item">
+        <span class="nav-icon">📨</span> Requests <span class="nav-badge">3</span>
+      </a>
+      <a href="#" class="nav-item" onclick="switchTab('edit',this)">
+        <span class="nav-icon">⚙️</span> Edit Profile
+      </a>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+    </div>
+
+    <div class="impact-card">
+      <h3>🌍 My Eco Impact</h3>
+      <div class="impact-item"><span>CO₂ Saved</span><strong>14.2 kg</strong></div>
+      <div class="impact-bar"><div class="impact-bar-fill" style="width:71%"></div></div>
+      <div class="impact-item"><span>Items Diverted</span><strong>12</strong></div>
+      <div class="impact-bar"><div class="impact-bar-fill" style="width:60%"></div></div>
+      <div class="impact-item"><span>Waste Reduced</span><strong>8.6 kg</strong></div>
+      <div class="impact-bar"><div class="impact-bar-fill" style="width:43%"></div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="profile-main">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('listings',this)">📦 My Listings</button>
+      <button class="tab" onclick="switchTab('history',this)">🔄 Swap History</button>
+      <button class="tab" onclick="switchTab('edit',this)">⚙️ Edit Profile</button>
+    </div>
+
+    <!-- LISTINGS TAB -->
+    <div class="tab-content active" id="tab-listings">
+      <div class="my-listings-grid">
+        <div class="my-listing-card">
+          <div class="my-listing-img">📱<span class="listing-status status-active">Active</span></div>
+          <div class="my-listing-body">
+            <h4>Samsung Galaxy Tab A8</h4>
+            <p>Electronics · Swap · 47 views</p>
+            <div class="listing-actions">
+              <button class="action-btn">✏️ Edit</button>
+              <button class="action-btn danger">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+        <div class="my-listing-card">
+          <div class="my-listing-img">🚲<span class="listing-status status-pending">3 Requests</span></div>
+          <div class="my-listing-body">
+            <h4>Mountain Bicycle</h4>
+            <p>Sports · RM 350 · 89 views</p>
+            <div class="listing-actions">
+              <button class="action-btn">✏️ Edit</button>
+              <button class="action-btn danger">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+        <div class="my-listing-card">
+          <div class="my-listing-img">📚<span class="listing-status status-active">Active</span></div>
+          <div class="my-listing-body">
+            <h4>Engineering Textbooks</h4>
+            <p>Books · Swap · 31 views</p>
+            <div class="listing-actions">
+              <button class="action-btn">✏️ Edit</button>
+              <button class="action-btn danger">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+        <div class="my-listing-card">
+          <div class="my-listing-img">🪑<span class="listing-status status-sold">Sold</span></div>
+          <div class="my-listing-body">
+            <h4>Office Chair</h4>
+            <p>Furniture · RM 120 · 55 views</p>
+            <div class="listing-actions">
+              <button class="action-btn">👁️ View</button>
+              <button class="action-btn danger">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+        <div class="my-listing-card">
+          <div class="my-listing-img">🎮<span class="listing-status status-active">Active</span></div>
+          <div class="my-listing-body">
+            <h4>PS4 Controller</h4>
+            <p>Electronics · RM 95 · 22 views</p>
+            <div class="listing-actions">
+              <button class="action-btn">✏️ Edit</button>
+              <button class="action-btn danger">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+        <div class="my-listing-card">
+          <div class="my-listing-img">👟<span class="listing-status status-active">Active</span></div>
+          <div class="my-listing-body">
+            <h4>Nike Running Shoes</h4>
+            <p>Clothing · Swap · 18 views</p>
+            <div class="listing-actions">
+              <button class="action-btn">✏️ Edit</button>
+              <button class="action-btn danger">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY TAB -->
+    <div class="tab-content" id="tab-history">
+      <div class="history-list">
+        <div class="history-item">
+          <div class="history-icons">
+            <div class="h-icon">📱</div>
+            <div class="h-arrow">⇄</div>
+            <div class="h-icon">🎧</div>
+          </div>
+          <div class="history-info">
+            <h4>Samsung Tab A8 ↔ Sony Headphones</h4>
+            <p>Swapped with Faiz · Batu Pahat · 2 Jan 2026</p>
+          </div>
+          <span class="history-status hs-completed">Completed</span>
+        </div>
+        <div class="history-item">
+          <div class="history-icons">
+            <div class="h-icon">🪑</div>
+            <div class="h-arrow">💰</div>
+            <div class="h-icon">💵</div>
+          </div>
+          <div class="history-info">
+            <h4>Office Chair — Sold for RM 120</h4>
+            <p>Sold to Amirah · Johor Bahru · 15 Dec 2025</p>
+          </div>
+          <span class="history-status hs-completed">Completed</span>
+        </div>
+        <div class="history-item">
+          <div class="history-icons">
+            <div class="h-icon">📚</div>
+            <div class="h-arrow">⇄</div>
+            <div class="h-icon">📖</div>
+          </div>
+          <div class="history-info">
+            <h4>Engineering Textbooks ↔ Harry Potter Set</h4>
+            <p>Awaiting confirmation · Melaka</p>
+          </div>
+          <span class="history-status hs-pending">Pending</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT TAB -->
+    <div class="tab-content" id="tab-edit">
+      <div class="edit-form">
+        <h3>⚙️ Edit Profile</h3>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" value="Bashiir" />
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" value="Mohamed" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" value="bashiir@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" value="+60 12-345 6789" />
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>State</label>
+            <select>
+              <option selected>Johor</option>
+              <option>Kuala Lumpur</option>
+              <option>Selangor</option>
+              <option>Penang</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" value="Muar" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Bio</label>
+          <textarea>Passionate about sustainability and reducing waste. Love swapping books, electronics and sports gear!</textarea>
+        </div>
+        <button class="save-btn" onclick="alert('Profile saved!')">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tabName, el) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tabName).classList.add('active');
+    if (el) el.classList.add('active');
+    return false;
+  }
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+

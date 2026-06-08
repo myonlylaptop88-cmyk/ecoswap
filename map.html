@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoSwap — Map View</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1a7a4a; --green-light: #25a863;
+      --green-pale: #e8f5ee; --green-mid: #b8dfc8;
+      --cream: #f9f6f0; --dark: #0f1f14;
+      --text: #1c2e20; --muted: #5a7a63;
+      --white: #ffffff;
+      --card-shadow: 0 4px 24px rgba(26,122,74,0.10);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    nav { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 68px; background: rgba(249,246,240,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--green-mid); z-index: 1000; }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--green); text-decoration: none; }
+    .nav-logo span { color: var(--green-light); }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { text-decoration: none; color: var(--text); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--green); }
+    .nav-cta { display: flex; gap: 12px; }
+    .btn-outline { padding: 8px 20px; border-radius: 8px; border: 1.5px solid var(--green); color: var(--green); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-outline:hover { background: var(--green-pale); }
+    .btn-primary { padding: 8px 20px; border-radius: 8px; background: var(--green); color: var(--white); border: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--green-light); }
+
+    /* MAP LAYOUT */
+    .map-layout { flex: 1; display: grid; grid-template-columns: 340px 1fr; overflow: hidden; }
+
+    /* LEFT PANEL */
+    .map-sidebar { background: var(--white); border-right: 1px solid var(--green-mid); display: flex; flex-direction: column; overflow: hidden; }
+    .sidebar-search { padding: 16px; border-bottom: 1px solid var(--green-mid); }
+    .search-bar { display: flex; background: var(--cream); border: 1.5px solid var(--green-mid); border-radius: 10px; overflow: hidden; }
+    .search-bar input { flex: 1; padding: 10px 14px; border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text); background: transparent; }
+    .search-bar button { padding: 10px 16px; background: var(--green); color: var(--white); border: none; cursor: pointer; font-size: 0.85rem; transition: background 0.2s; }
+    .search-bar button:hover { background: var(--green-light); }
+    .filter-chips { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; border-bottom: 1px solid var(--green-mid); }
+    .chip { padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--green-mid); background: var(--white); font-size: 0.78rem; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .chip:hover, .chip.active { background: var(--green-pale); border-color: var(--green); color: var(--green); }
+    .sidebar-header { padding: 14px 16px 8px; display: flex; justify-content: space-between; align-items: center; }
+    .sidebar-header h3 { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--dark); }
+    .sidebar-header span { font-size: 0.8rem; color: var(--muted); }
+    .listings-list { flex: 1; overflow-y: auto; padding: 0 12px 12px; }
+    .list-card { display: flex; gap: 12px; padding: 12px; border-radius: 12px; cursor: pointer; transition: background 0.2s; border: 1px solid transparent; margin-bottom: 8px; text-decoration: none; color: inherit; }
+    .list-card:hover, .list-card.active { background: var(--green-pale); border-color: var(--green-mid); }
+    .list-card-img { width: 64px; height: 64px; border-radius: 10px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; border: 1px solid var(--green-mid); }
+    .list-card-info { flex: 1; min-width: 0; }
+    .list-card-info h4 { font-family: 'Syne', sans-serif; font-size: 0.88rem; font-weight: 700; color: var(--dark); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .list-card-info p { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; }
+    .list-card-footer { display: flex; align-items: center; gap: 6px; }
+    .badge-swap { padding: 3px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; background: var(--green-pale); color: var(--green); border: 1px solid var(--green-mid); }
+    .badge-buy { padding: 3px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+    .dist { font-size: 0.72rem; color: var(--muted); }
+
+    /* MAP */
+    .map-container { position: relative; flex: 1; }
+    #map { width: 100%; height: 100%; }
+
+    /* MAP CONTROLS */
+    .map-controls { position: absolute; top: 16px; right: 16px; z-index: 500; display: flex; flex-direction: column; gap: 8px; }
+    .map-btn { width: 40px; height: 40px; border-radius: 10px; background: var(--white); border: 1px solid var(--green-mid); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; box-shadow: var(--card-shadow); transition: all 0.2s; }
+    .map-btn:hover { background: var(--green-pale); border-color: var(--green); }
+    .locate-btn { position: absolute; bottom: 24px; right: 16px; z-index: 500; background: var(--green); color: var(--white); border: none; border-radius: 12px; padding: 10px 18px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 16px rgba(26,122,74,0.3); transition: background 0.2s; display: flex; align-items: center; gap: 8px; }
+    .locate-btn:hover { background: var(--green-light); }
+    .map-stats { position: absolute; top: 16px; left: 16px; z-index: 500; background: var(--white); border: 1px solid var(--green-mid); border-radius: 12px; padding: 10px 16px; box-shadow: var(--card-shadow); display: flex; gap: 16px; }
+    .map-stat { text-align: center; }
+    .map-stat strong { display: block; font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800; color: var(--dark); }
+    .map-stat span { font-size: 0.72rem; color: var(--muted); }
+
+    /* POPUP CARD */
+    .leaflet-popup-content-wrapper { border-radius: 14px !important; border: 1px solid var(--green-mid) !important; box-shadow: var(--card-shadow) !important; padding: 0 !important; overflow: hidden; }
+    .leaflet-popup-content { margin: 0 !important; width: 220px !important; }
+    .popup-img { height: 90px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 2.8rem; }
+    .popup-body { padding: 12px; }
+    .popup-body h4 { font-family: 'Syne', sans-serif; font-size: 0.88rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .popup-body p { font-size: 0.78rem; color: var(--muted); margin-bottom: 8px; }
+    .popup-footer { display: flex; justify-content: space-between; align-items: center; }
+    .popup-price { font-size: 0.82rem; font-weight: 600; color: var(--green); }
+    .popup-link { font-size: 0.78rem; color: var(--green); text-decoration: none; font-weight: 600; }
+    .leaflet-popup-tip-container { display: none; }
+
+    @media (max-width: 768px) { .map-sidebar { display: none; } .map-layout { grid-template-columns: 1fr; } .nav-links { display: none; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Eco<span>Swap</span></a>
+  <div class="nav-links">
+    <a href="browse.html">Browse</a>
+    <a href="map.html" class="active">Map</a>
+    <a href="post.html">Post Item</a>
+    <a href="about.html">About</a>
+  </div>
+  <div class="nav-cta">
+    <a href="login.html" class="btn-outline">Login</a>
+    <a href="post.html" class="btn-primary">+ Post Item</a>
+  </div>
+</nav>
+
+<div class="map-layout">
+  <!-- SIDEBAR -->
+  <aside class="map-sidebar">
+    <div class="sidebar-search">
+      <div class="search-bar">
+        <input type="text" placeholder="Search nearby items..." id="sideSearch" oninput="filterSide()" />
+        <button>🔍</button>
+      </div>
+    </div>
+    <div class="filter-chips">
+      <span class="chip active" onclick="filterChip(this,'')">All</span>
+      <span class="chip" onclick="filterChip(this,'electronics')">📱 Electronics</span>
+      <span class="chip" onclick="filterChip(this,'clothing')">👕 Clothing</span>
+      <span class="chip" onclick="filterChip(this,'books')">📚 Books</span>
+      <span class="chip" onclick="filterChip(this,'furniture')">🪑 Furniture</span>
+    </div>
+    <div class="sidebar-header">
+      <h3>Nearby Listings</h3>
+      <span id="nearbyCount">12 found</span>
+    </div>
+    <div class="listings-list" id="listingsList"></div>
+  </aside>
+
+  <!-- MAP -->
+  <div class="map-container">
+    <div id="map"></div>
+    <div class="map-stats">
+      <div class="map-stat"><strong>12</strong><span>Listings</span></div>
+      <div class="map-stat"><strong>8</strong><span>Swap</span></div>
+      <div class="map-stat"><strong>4</strong><span>Buy</span></div>
+    </div>
+    <button class="locate-btn" onclick="locateUser()">📍 My Location</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const listings = [
+    { id:1, title:'Samsung Galaxy Tab A8', category:'electronics', city:'Batu Pahat', state:'Johor', type:'swap', price:'Open to offers', icon:'📱', lat:1.8529, lng:102.9325, dist:'0.8 km' },
+    { id:2, title:'Mountain Bicycle', category:'sports', city:'Muar', state:'Johor', type:'buy', price:'RM 350', icon:'🚲', lat:2.0442, lng:102.5689, dist:'12.4 km' },
+    { id:3, title:'Engineering Textbooks', category:'books', city:'Skudai', state:'Johor', type:'swap', price:'Open to offers', icon:'📚', lat:1.5330, lng:103.6547, dist:'18.2 km' },
+    { id:4, title:'Office Chair', category:'furniture', city:'Johor Bahru', state:'Johor', type:'buy', price:'RM 120', icon:'🪑', lat:1.4927, lng:103.7414, dist:'22.1 km' },
+    { id:5, title:'Nike Running Shoes', category:'clothing', city:'Kuala Lumpur', state:'KL', type:'swap', price:'Open to offers', icon:'👟', lat:3.1390, lng:101.6869, dist:'190 km' },
+    { id:6, title:'LEGO Creator Set', category:'toys', city:'Petaling Jaya', state:'Selangor', type:'buy', price:'RM 85', icon:'🧸', lat:3.1073, lng:101.6067, dist:'195 km' },
+    { id:7, title:'Acoustic Guitar', category:'sports', city:'Georgetown', state:'Penang', type:'swap', price:'Open to offers', icon:'🎸', lat:5.4141, lng:100.3288, dist:'410 km' },
+    { id:8, title:'Winter Jacket (XL)', category:'clothing', city:'Ipoh', state:'Perak', type:'buy', price:'RM 65', icon:'🧥', lat:4.5975, lng:101.0901, dist:'320 km' },
+    { id:9, title:'iPhone 12 (128GB)', category:'electronics', city:'Subang Jaya', state:'Selangor', type:'swap', price:'Open to offers', icon:'📱', lat:3.0565, lng:101.5851, dist:'198 km' },
+    { id:10, title:'Wooden Study Desk', category:'furniture', city:'Shah Alam', state:'Selangor', type:'buy', price:'RM 200', icon:'🪵', lat:3.0733, lng:101.5185, dist:'200 km' },
+    { id:11, title:'Harry Potter Book Set', category:'books', city:'Melaka', state:'Melaka', type:'swap', price:'Open to offers', icon:'📖', lat:2.1896, lng:102.2501, dist:'85 km' },
+    { id:12, title:'PS4 Controller', category:'electronics', city:'Kota Kinabalu', state:'Sabah', type:'buy', price:'RM 95', icon:'🎮', lat:5.9788, lng:116.0753, dist:'1,600 km' },
+  ];
+
+  let activeCategory = '';
+  let markers = [];
+
+  // Init map centered on Malaysia
+  const map = L.map('map').setView([2.5, 108.0], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
+  }).addTo(map);
+
+  function makeIcon(emoji, type) {
+    return L.divIcon({
+      html: `<div style="background:${type==='swap'?'#1a7a4a':'#e65100'};color:white;border-radius:50% 50% 50% 0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transform:rotate(-45deg);border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)"><span style="transform:rotate(45deg)">${emoji}</span></div>`,
+      className: '',
+      iconSize: [36, 36],
+      iconAnchor: [18, 36],
+      popupAnchor: [0, -36]
+    });
+  }
+
+  function renderMap(data) {
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+    data.forEach(item => {
+      const marker = L.marker([item.lat, item.lng], { icon: makeIcon(item.icon, item.type) }).addTo(map);
+      marker.bindPopup(`
+        <div class="popup-img">${item.icon}</div>
+        <div class="popup-body">
+          <h4>${item.title}</h4>
+          <p>📍 ${item.city}, ${item.state}</p>
+          <div class="popup-footer">
+            <span class="popup-price">${item.price}</span>
+            <a href="item.html" class="popup-link">View →</a>
+          </div>
+        </div>
+      `);
+      markers.push(marker);
+    });
+  }
+
+  function renderSidebar(data) {
+    const list = document.getElementById('listingsList');
+    document.getElementById('nearbyCount').textContent = data.length + ' found';
+    list.innerHTML = data.map(item => `
+      <a href="item.html" class="list-card">
+        <div class="list-card-img">${item.icon}</div>
+        <div class="list-card-info">
+          <h4>${item.title}</h4>
+          <p>📍 ${item.city}, ${item.state}</p>
+          <div class="list-card-footer">
+            <span class="${item.type === 'swap' ? 'badge-swap' : 'badge-buy'}">${item.type === 'swap' ? 'Swap' : 'Buy'}</span>
+            <span class="dist">${item.dist}</span>
+          </div>
+        </div>
+      </a>
+    `).join('');
+  }
+
+  function filterAll() {
+    const search = document.getElementById('sideSearch').value.toLowerCase();
+    return listings.filter(item => {
+      const matchCat = !activeCategory || item.category === activeCategory;
+      const matchSearch = !search || item.title.toLowerCase().includes(search) || item.city.toLowerCase().includes(search);
+      return matchCat && matchSearch;
+    });
+  }
+
+  function filterSide() {
+    const data = filterAll();
+    renderSidebar(data);
+    renderMap(data);
+  }
+
+  function filterChip(el, cat) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    activeCategory = cat;
+    filterSide();
+  }
+
+  function locateUser() {
+    if (!navigator.geolocation) { alert('Geolocation not supported.'); return; }
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      map.setView([lat, lng], 12);
+      L.circle([lat, lng], { radius: 5000, color: '#1a7a4a', fillColor: '#e8f5ee', fillOpacity: 0.3 }).addTo(map);
+      L.marker([lat, lng], { icon: makeIcon('📍', 'swap') }).addTo(map).bindPopup('You are here').openPopup();
+    }, () => alert('Could not get your location.'));
+  }
+
+  // Initial render
+  renderMap(listings);
+  renderSidebar(listings);
+</script>
+
+</body>
+</html>

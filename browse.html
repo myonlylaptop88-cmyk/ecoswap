@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoSwap — Browse Listings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1a7a4a; --green-light: #25a863;
+      --green-pale: #e8f5ee; --green-mid: #b8dfc8;
+      --cream: #f9f6f0; --dark: #0f1f14;
+      --text: #1c2e20; --muted: #5a7a63;
+      --white: #ffffff;
+      --card-shadow: 0 4px 24px rgba(26,122,74,0.10);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+
+    /* NAVBAR */
+    nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 68px; background: rgba(249,246,240,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--green-mid); }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--green); text-decoration: none; }
+    .nav-logo span { color: var(--green-light); }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { text-decoration: none; color: var(--text); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--green); }
+    .nav-cta { display: flex; gap: 12px; }
+    .btn-outline { padding: 8px 20px; border-radius: 8px; border: 1.5px solid var(--green); color: var(--green); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-outline:hover { background: var(--green-pale); }
+    .btn-primary { padding: 8px 20px; border-radius: 8px; background: var(--green); color: var(--white); border: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--green-light); }
+
+    /* SEARCH HERO */
+    .search-hero { background: var(--green); padding: 48px 5%; }
+    .search-hero h1 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--white); margin-bottom: 20px; }
+    .search-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .search-bar { display: flex; flex: 1; min-width: 280px; background: var(--white); border-radius: 10px; overflow: hidden; }
+    .search-bar input { flex: 1; padding: 13px 18px; border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--text); }
+    .search-bar button { padding: 13px 24px; background: var(--dark); color: var(--white); border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: background 0.2s; }
+    .search-bar button:hover { background: #1a3520; }
+    .filter-select { padding: 13px 18px; border-radius: 10px; border: none; background: rgba(255,255,255,0.15); color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.92rem; cursor: pointer; outline: none; }
+    .filter-select option { color: var(--text); background: var(--white); }
+
+    /* MAIN LAYOUT */
+    .main-layout { display: grid; grid-template-columns: 260px 1fr; gap: 0; min-height: calc(100vh - 68px - 140px); }
+
+    /* SIDEBAR */
+    .sidebar { background: var(--white); border-right: 1px solid var(--green-mid); padding: 28px 20px; }
+    .sidebar h3 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .filter-group { margin-bottom: 28px; }
+    .filter-group h4 { font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .category-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border-radius: 8px; border: none; background: transparent; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text); transition: all 0.2s; margin-bottom: 4px; text-align: left; }
+    .category-btn:hover { background: var(--green-pale); color: var(--green); }
+    .category-btn.active { background: var(--green-pale); color: var(--green); font-weight: 600; }
+    .category-btn .cat-icon { font-size: 1rem; }
+    .category-btn .cat-count { margin-left: auto; font-size: 0.78rem; color: var(--muted); background: var(--green-pale); padding: 2px 8px; border-radius: 10px; }
+    .range-group input[type=range] { width: 100%; accent-color: var(--green); margin-bottom: 8px; }
+    .range-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--muted); }
+    .checkbox-group label { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--text); margin-bottom: 10px; cursor: pointer; }
+    .checkbox-group input { accent-color: var(--green); }
+    .btn-clear { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid var(--green-mid); background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
+    .btn-clear:hover { background: var(--green-pale); color: var(--green); }
+
+    /* LISTINGS AREA */
+    .listings-area { padding: 28px 32px; }
+    .listings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .listings-count { font-size: 0.92rem; color: var(--muted); }
+    .listings-count strong { color: var(--text); }
+    .sort-row { display: flex; align-items: center; gap: 12px; }
+    .sort-row label { font-size: 0.88rem; color: var(--muted); }
+    .sort-row select { padding: 7px 12px; border-radius: 8px; border: 1.5px solid var(--green-mid); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; color: var(--text); outline: none; cursor: pointer; }
+    .view-toggle { display: flex; gap: 4px; }
+    .view-btn { width: 34px; height: 34px; border-radius: 7px; border: 1.5px solid var(--green-mid); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 0.85rem; }
+    .view-btn.active { background: var(--green); border-color: var(--green); color: var(--white); }
+
+    /* GRID */
+    .listings-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .listing-card { background: var(--white); border-radius: 16px; overflow: hidden; border: 1px solid var(--green-mid); box-shadow: var(--card-shadow); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
+    .listing-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(26,122,74,0.15); }
+    .listing-img { width: 100%; height: 170px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 3.2rem; position: relative; }
+    .listing-badge { position: absolute; top: 10px; left: 10px; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
+    .badge-swap { background: var(--green-pale); color: var(--green); border: 1px solid var(--green-mid); }
+    .badge-buy { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+    .listing-body { padding: 16px; }
+    .listing-body h4 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; color: var(--dark); }
+    .listing-loc { font-size: 0.8rem; color: var(--muted); margin-bottom: 10px; }
+    .listing-footer { display: flex; justify-content: space-between; align-items: center; }
+    .listing-price { font-size: 0.9rem; font-weight: 600; color: var(--green); }
+    .listing-time { font-size: 0.75rem; color: var(--muted); }
+
+    /* PAGINATION */
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 40px 0 20px; }
+    .page-btn { width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--green-mid); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+    .page-btn:hover { background: var(--green-pale); border-color: var(--green); color: var(--green); }
+    .page-btn.active { background: var(--green); border-color: var(--green); color: var(--white); }
+
+    @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } .sidebar { display: none; } .listings-grid { grid-template-columns: repeat(2, 1fr); } .nav-links { display: none; } }
+    @media (max-width: 560px) { .listings-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Eco<span>Swap</span></a>
+  <div class="nav-links">
+    <a href="browse.html" class="active">Browse</a>
+    <a href="map.html">Map</a>
+    <a href="post.html">Post Item</a>
+    <a href="about.html">About</a>
+  </div>
+  <div class="nav-cta">
+    <a href="login.html" class="btn-outline">Login</a>
+    <a href="post.html" class="btn-primary">+ Post Item</a>
+  </div>
+</nav>
+
+<!-- SEARCH HERO -->
+<div class="search-hero">
+  <h1>Browse Listings</h1>
+  <div class="search-row">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search items, categories..." />
+      <button onclick="filterListings()">Search</button>
+    </div>
+    <select class="filter-select" id="stateFilter" onchange="filterListings()">
+      <option value="">All States</option>
+      <option>Johor</option><option>Kedah</option><option>Kelantan</option>
+      <option>Kuala Lumpur</option><option>Melaka</option><option>Penang</option>
+      <option>Perak</option><option>Sabah</option><option>Sarawak</option><option>Selangor</option>
+    </select>
+    <select class="filter-select" id="typeFilter" onchange="filterListings()">
+      <option value="">Swap &amp; Buy</option>
+      <option value="swap">Swap Only</option>
+      <option value="buy">Buy Only</option>
+    </select>
+  </div>
+</div>
+
+<div class="main-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h3>Filters</h3>
+
+    <div class="filter-group">
+      <h4>Category</h4>
+      <button class="category-btn active" onclick="setCategory(this, '')">
+        <span class="cat-icon">🏠</span> All Items <span class="cat-count">48</span>
+      </button>
+      <button class="category-btn" onclick="setCategory(this, 'electronics')">
+        <span class="cat-icon">📱</span> Electronics <span class="cat-count">14</span>
+      </button>
+      <button class="category-btn" onclick="setCategory(this, 'clothing')">
+        <span class="cat-icon">👕</span> Clothing <span class="cat-count">11</span>
+      </button>
+      <button class="category-btn" onclick="setCategory(this, 'books')">
+        <span class="cat-icon">📚</span> Books <span class="cat-count">9</span>
+      </button>
+      <button class="category-btn" onclick="setCategory(this, 'furniture')">
+        <span class="cat-icon">🪑</span> Furniture <span class="cat-count">7</span>
+      </button>
+      <button class="category-btn" onclick="setCategory(this, 'sports')">
+        <span class="cat-icon">⚽</span> Sports <span class="cat-count">5</span>
+      </button>
+      <button class="category-btn" onclick="setCategory(this, 'toys')">
+        <span class="cat-icon">🧸</span> Toys <span class="cat-count">4</span>
+      </button>
+    </div>
+
+    <div class="filter-group">
+      <h4>Price Range</h4>
+      <div class="range-group">
+        <input type="range" min="0" max="1000" value="1000" id="priceRange" oninput="document.getElementById('priceVal').textContent='RM '+this.value" />
+        <div class="range-labels"><span>RM 0</span><span id="priceVal">RM 1000</span></div>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h4>Listing Type</h4>
+      <div class="checkbox-group">
+        <label><input type="checkbox" checked /> Swap</label>
+        <label><input type="checkbox" checked /> Buy Now</label>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h4>Condition</h4>
+      <div class="checkbox-group">
+        <label><input type="checkbox" checked /> Like New</label>
+        <label><input type="checkbox" checked /> Good</label>
+        <label><input type="checkbox" checked /> Fair</label>
+      </div>
+    </div>
+
+    <button class="btn-clear">Clear All Filters</button>
+  </aside>
+
+  <!-- LISTINGS -->
+  <div class="listings-area">
+    <div class="listings-header">
+      <p class="listings-count">Showing <strong id="countDisplay">12</strong> listings</p>
+      <div class="sort-row">
+        <label>Sort by:</label>
+        <select>
+          <option>Newest First</option>
+          <option>Oldest First</option>
+          <option>Price: Low to High</option>
+          <option>Price: High to Low</option>
+        </select>
+        <div class="view-toggle">
+          <button class="view-btn active">⊞</button>
+          <button class="view-btn">☰</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="listings-grid" id="listingsGrid">
+      <!-- Cards injected by JS -->
+    </div>
+
+    <div class="pagination">
+      <button class="page-btn">‹</button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn">›</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const allListings = [
+    { id:1, title:'Samsung Galaxy Tab A8', category:'electronics', location:'Batu Pahat, Johor', type:'swap', price:'Open to offers', icon:'📱', time:'2 hours ago' },
+    { id:2, title:'Mountain Bicycle', category:'sports', location:'Muar, Johor', type:'buy', price:'RM 350', icon:'🚲', time:'5 hours ago' },
+    { id:3, title:'Engineering Textbooks (Set)', category:'books', location:'Skudai, Johor', type:'swap', price:'Open to offers', icon:'📚', time:'Yesterday' },
+    { id:4, title:'Office Chair (Ergonomic)', category:'furniture', location:'Johor Bahru', type:'buy', price:'RM 120', icon:'🪑', time:'Yesterday' },
+    { id:5, title:'Nike Running Shoes (Size 42)', category:'clothing', location:'Kuala Lumpur', type:'swap', price:'Open to offers', icon:'👟', time:'2 days ago' },
+    { id:6, title:'LEGO Creator Set', category:'toys', location:'Petaling Jaya, Selangor', type:'buy', price:'RM 85', icon:'🧸', time:'2 days ago' },
+    { id:7, title:'Acoustic Guitar', category:'sports', location:'Georgetown, Penang', type:'swap', price:'Open to offers', icon:'🎸', time:'3 days ago' },
+    { id:8, title:'Winter Jacket (XL)', category:'clothing', location:'Ipoh, Perak', type:'buy', price:'RM 65', icon:'🧥', time:'3 days ago' },
+    { id:9, title:'iPhone 12 (128GB)', category:'electronics', location:'Subang Jaya, Selangor', type:'swap', price:'Open to offers', icon:'📱', time:'4 days ago' },
+    { id:10, title:'Wooden Study Desk', category:'furniture', location:'Shah Alam, Selangor', type:'buy', price:'RM 200', icon:'🪵', time:'4 days ago' },
+    { id:11, title:'Harry Potter Book Set', category:'books', location:'Melaka', type:'swap', price:'Open to offers', icon:'📖', time:'5 days ago' },
+    { id:12, title:'PS4 Controller', category:'electronics', location:'Kota Kinabalu, Sabah', type:'buy', price:'RM 95', icon:'🎮', time:'5 days ago' },
+  ];
+
+  let filtered = [...allListings];
+  let activeCategory = '';
+
+  function renderListings(data) {
+    const grid = document.getElementById('listingsGrid');
+    document.getElementById('countDisplay').textContent = data.length;
+    grid.innerHTML = data.map(item => `
+      <a href="item.html?id=${item.id}" class="listing-card">
+        <div class="listing-img">
+          ${item.icon}
+          <span class="listing-badge ${item.type === 'swap' ? 'badge-swap' : 'badge-buy'}">
+            ${item.type === 'swap' ? 'Swap' : 'Buy'}
+          </span>
+        </div>
+        <div class="listing-body">
+          <h4>${item.title}</h4>
+          <p class="listing-loc">📍 ${item.location}</p>
+          <div class="listing-footer">
+            <span class="listing-price">${item.price}</span>
+            <span class="listing-time">${item.time}</span>
+          </div>
+        </div>
+      </a>
+    `).join('');
+  }
+
+  function filterListings() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const state = document.getElementById('stateFilter').value.toLowerCase();
+    const type = document.getElementById('typeFilter').value.toLowerCase();
+
+    filtered = allListings.filter(item => {
+      const matchSearch = item.title.toLowerCase().includes(search) || item.category.includes(search);
+      const matchState = !state || item.location.toLowerCase().includes(state);
+      const matchType = !type || item.type === type;
+      const matchCat = !activeCategory || item.category === activeCategory;
+      return matchSearch && matchState && matchType && matchCat;
+    });
+    renderListings(filtered);
+  }
+
+  function setCategory(btn, cat) {
+    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCategory = cat;
+    filterListings();
+  }
+
+  // Initial render
+  renderListings(allListings);
+</script>
+
+</body>
+</html>
+

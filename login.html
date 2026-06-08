@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoSwap — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1a7a4a;
+      --green-light: #25a863;
+      --green-pale: #e8f5ee;
+      --green-mid: #b8dfc8;
+      --cream: #f9f6f0;
+      --dark: #0f1f14;
+      --text: #1c2e20;
+      --muted: #5a7a63;
+      --white: #ffffff;
+      --error: #d32f2f;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* NAVBAR */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; height: 68px;
+      background: rgba(249,246,240,0.95);
+      border-bottom: 1px solid var(--green-mid);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.5rem;
+      color: var(--green); text-decoration: none;
+    }
+    .nav-logo span { color: var(--green-light); }
+    .btn-outline {
+      padding: 8px 20px; border-radius: 8px;
+      border: 1.5px solid var(--green);
+      color: var(--green); background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; font-weight: 500;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover { background: var(--green-pale); }
+
+    /* MAIN LAYOUT */
+    .page-wrap {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 68px);
+    }
+
+    /* LEFT PANEL */
+    .left-panel {
+      background: var(--green);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 60px;
+      position: relative; overflow: hidden;
+    }
+    .left-panel::before {
+      content: '';
+      position: absolute; top: -100px; right: -100px;
+      width: 400px; height: 400px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+    .left-panel::after {
+      content: '';
+      position: absolute; bottom: -80px; left: -80px;
+      width: 300px; height: 300px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+    .left-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.15);
+      color: var(--white); padding: 6px 14px;
+      border-radius: 20px; font-size: 0.82rem;
+      font-weight: 500; margin-bottom: 28px;
+    }
+    .left-panel h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.4rem; font-weight: 800;
+      color: var(--white); line-height: 1.2;
+      margin-bottom: 16px; position: relative; z-index: 1;
+    }
+    .left-panel p {
+      color: rgba(255,255,255,0.8);
+      font-size: 1rem; line-height: 1.7;
+      max-width: 360px; margin-bottom: 40px;
+      position: relative; z-index: 1;
+    }
+    .feature-list { list-style: none; position: relative; z-index: 1; }
+    .feature-list li {
+      display: flex; align-items: center; gap: 12px;
+      color: rgba(255,255,255,0.9);
+      font-size: 0.92rem; margin-bottom: 14px;
+    }
+    .feature-list li::before {
+      content: '✓';
+      width: 22px; height: 22px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; flex-shrink: 0;
+    }
+
+    /* RIGHT PANEL — FORM */
+    .right-panel {
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 60px 5%;
+      background: var(--white);
+    }
+    .form-box { width: 100%; max-width: 420px; }
+    .form-box h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem; font-weight: 800;
+      color: var(--dark); margin-bottom: 6px;
+    }
+    .form-box .subtitle {
+      color: var(--muted); font-size: 0.92rem;
+      margin-bottom: 32px;
+    }
+    .form-box .subtitle a {
+      color: var(--green); text-decoration: none; font-weight: 500;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block; font-size: 0.88rem;
+      font-weight: 500; color: var(--text);
+      margin-bottom: 8px;
+    }
+    .form-group input {
+      width: 100%; padding: 12px 16px;
+      border: 1.5px solid var(--green-mid);
+      border-radius: 10px; outline: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem; color: var(--text);
+      background: var(--cream);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(26,122,74,0.1);
+      background: var(--white);
+    }
+    .form-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 24px;
+    }
+    .remember {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.88rem; color: var(--muted); cursor: pointer;
+    }
+    .remember input { width: auto; margin: 0; }
+    .forgot { font-size: 0.88rem; color: var(--green); text-decoration: none; }
+    .forgot:hover { text-decoration: underline; }
+
+    .btn-submit {
+      width: 100%; padding: 13px;
+      background: var(--green); color: var(--white);
+      border: none; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: background 0.2s;
+      margin-bottom: 20px;
+    }
+    .btn-submit:hover { background: var(--green-light); }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1;
+      height: 1px; background: var(--green-mid);
+    }
+    .divider span { font-size: 0.82rem; color: var(--muted); white-space: nowrap; }
+
+    .btn-google {
+      width: 100%; padding: 12px;
+      background: var(--white); color: var(--text);
+      border: 1.5px solid var(--green-mid);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center;
+      justify-content: center; gap: 10px;
+    }
+    .btn-google:hover { background: var(--cream); border-color: var(--green); }
+
+    .error-msg {
+      background: #fdecea; border: 1px solid #f5c6c6;
+      color: var(--error); padding: 10px 14px;
+      border-radius: 8px; font-size: 0.88rem;
+      margin-bottom: 16px; display: none;
+    }
+
+    @media (max-width: 768px) {
+      .page-wrap { grid-template-columns: 1fr; }
+      .left-panel { display: none; }
+      .right-panel { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Eco<span>Swap</span></a>
+  <a href="register.html" class="btn-outline">Create Account</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="left-tag">🌱 Welcome back</div>
+    <h2>Good to see<br/>you again.</h2>
+    <p>Log in to continue swapping, saving, and building a more sustainable community.</p>
+    <ul class="feature-list">
+      <li>Browse thousands of local listings</li>
+      <li>Send and receive swap requests</li>
+      <li>Track your sustainability impact</li>
+      <li>Secure checkout with Stripe</li>
+    </ul>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="form-box">
+      <h1>Login</h1>
+      <p class="subtitle">Don't have an account? <a href="register.html">Register here</a></p>
+
+      <div class="error-msg" id="errorMsg">Invalid email or password. Please try again.</div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="you@example.com" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" />
+      </div>
+
+      <div class="form-row">
+        <label class="remember">
+          <input type="checkbox" /> Remember me
+        </label>
+        <a href="#" class="forgot">Forgot password?</a>
+      </div>
+
+      <button class="btn-submit" onclick="handleLogin()">Login to EcoSwap</button>
+
+      <div class="divider"><span>or continue with</span></div>
+
+      <button class="btn-google">
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        Continue with Google
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { firebaseConfig } from "./js/firebase.js";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  window.handleLogin = async function() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorMsg = document.getElementById('errorMsg');
+    errorMsg.style.display = 'none';
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      errorMsg.style.display = 'block';
+    }
+  };
+
+  document.querySelector('.btn-google').addEventListener('click', async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      document.getElementById('errorMsg').style.display = 'block';
+    }
+  });
+</script>
+
+</body>
+</html>

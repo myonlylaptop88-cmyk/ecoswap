@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoSwap — About & SDG9</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1a7a4a; --green-light: #25a863;
+      --green-pale: #e8f5ee; --green-mid: #b8dfc8;
+      --cream: #f9f6f0; --dark: #0f1f14;
+      --text: #1c2e20; --muted: #5a7a63;
+      --white: #ffffff;
+      --card-shadow: 0 4px 24px rgba(26,122,74,0.10);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+    nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 68px; background: rgba(249,246,240,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--green-mid); }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--green); text-decoration: none; }
+    .nav-logo span { color: var(--green-light); }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { text-decoration: none; color: var(--text); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--green); }
+    .nav-cta { display: flex; gap: 12px; }
+    .btn-outline { padding: 8px 20px; border-radius: 8px; border: 1.5px solid var(--green); color: var(--green); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-outline:hover { background: var(--green-pale); }
+    .btn-primary { padding: 8px 20px; border-radius: 8px; background: var(--green); color: var(--white); border: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--green-light); }
+
+    /* HERO */
+    .hero { background: linear-gradient(135deg, var(--dark) 0%, #1a3520 100%); padding: 80px 5%; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(26,122,74,0.3) 0%, transparent 70%); border-radius: 50%; }
+    .sdg-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(26,122,74,0.3); border: 1px solid rgba(37,168,99,0.4); color: var(--green-light); padding: 8px 18px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; position: relative; z-index: 1; }
+    .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; color: var(--white); line-height: 1.2; margin-bottom: 20px; position: relative; z-index: 1; }
+    .hero h1 em { color: var(--green-light); font-style: normal; }
+    .hero p { color: rgba(255,255,255,0.75); font-size: 1.05rem; line-height: 1.8; max-width: 600px; margin: 0 auto 36px; position: relative; z-index: 1; }
+    .hero-stats { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; position: relative; z-index: 1; }
+    .hero-stat { text-align: center; }
+    .hero-stat strong { display: block; font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--green-light); }
+    .hero-stat span { font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+
+    /* SECTION STYLES */
+    .section { padding: 80px 5%; }
+    .section-label { font-size: 0.82rem; font-weight: 600; color: var(--green); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+    h2 { font-family: 'Syne', sans-serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; color: var(--dark); margin-bottom: 16px; }
+    .section-sub { color: var(--muted); font-size: 1rem; line-height: 1.8; max-width: 640px; margin-bottom: 48px; }
+
+    /* MISSION */
+    .mission-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+    .mission-text p { color: var(--muted); line-height: 1.8; margin-bottom: 16px; font-size: 0.95rem; }
+    .mission-visual { background: var(--green-pale); border-radius: 24px; border: 1px solid var(--green-mid); padding: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .mission-card { background: var(--white); border-radius: 14px; padding: 20px; border: 1px solid var(--green-mid); box-shadow: var(--card-shadow); text-align: center; }
+    .mission-card .m-icon { font-size: 2rem; margin-bottom: 8px; }
+    .mission-card h4 { font-family: 'Syne', sans-serif; font-size: 0.88rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .mission-card p { font-size: 0.78rem; color: var(--muted); }
+
+    /* SDG9 SECTION */
+    .sdg-section { background: var(--green); padding: 80px 5%; }
+    .sdg-section .section-label { color: rgba(255,255,255,0.7); }
+    .sdg-section h2 { color: var(--white); }
+    .sdg-section .section-sub { color: rgba(255,255,255,0.8); }
+    .sdg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .sdg-card { background: rgba(255,255,255,0.12); border-radius: 16px; padding: 28px; border: 1px solid rgba(255,255,255,0.2); transition: background 0.2s; }
+    .sdg-card:hover { background: rgba(255,255,255,0.18); }
+    .sdg-card .sdg-icon { font-size: 2.2rem; margin-bottom: 14px; }
+    .sdg-card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+    .sdg-card p { font-size: 0.88rem; color: rgba(255,255,255,0.8); line-height: 1.7; }
+    .sdg-target { margin-top: 48px; background: rgba(255,255,255,0.1); border-radius: 16px; padding: 28px; border: 1px solid rgba(255,255,255,0.2); }
+    .sdg-target h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 16px; }
+    .target-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .target-item { display: flex; gap: 10px; align-items: flex-start; }
+    .target-item .t-num { background: rgba(255,255,255,0.2); color: var(--white); font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 5px; flex-shrink: 0; margin-top: 2px; }
+    .target-item p { font-size: 0.85rem; color: rgba(255,255,255,0.85); line-height: 1.5; }
+
+    /* IMPACT */
+    .impact-section { background: var(--dark); padding: 80px 5%; }
+    .impact-section h2 { color: var(--white); }
+    .impact-section .section-label { color: var(--green-light); }
+    .impact-section .section-sub { color: rgba(255,255,255,0.7); }
+    .impact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .impact-card { background: rgba(255,255,255,0.06); border-radius: 16px; padding: 28px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+    .impact-card .i-icon { font-size: 2rem; margin-bottom: 12px; }
+    .impact-card strong { display: block; font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--green-light); margin-bottom: 6px; }
+    .impact-card span { font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+
+    /* HOW WE WORK */
+    .how-section { padding: 80px 5%; }
+    .timeline { display: flex; flex-direction: column; gap: 0; max-width: 700px; margin: 0 auto; }
+    .timeline-item { display: flex; gap: 24px; padding-bottom: 32px; position: relative; }
+    .timeline-item:not(:last-child)::before { content: ''; position: absolute; left: 19px; top: 44px; bottom: 0; width: 2px; background: var(--green-mid); }
+    .t-num { width: 40px; height: 40px; border-radius: 50%; background: var(--green); color: var(--white); font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; z-index: 1; }
+    .t-content h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; margin-top: 8px; }
+    .t-content p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+
+    /* TEAM */
+    .team-section { background: var(--green-pale); padding: 80px 5%; }
+    .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .team-card { background: var(--white); border-radius: 16px; padding: 28px 20px; text-align: center; border: 1px solid var(--green-mid); box-shadow: var(--card-shadow); }
+    .team-avatar { width: 70px; height: 70px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--white); margin: 0 auto 14px; }
+    .team-card h4 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .team-card p { font-size: 0.8rem; color: var(--muted); }
+
+    /* CTA */
+    .cta-section { padding: 80px 5%; text-align: center; }
+    .cta-section h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin-bottom: 16px; }
+    .cta-section p { color: var(--muted); max-width: 500px; margin: 0 auto 32px; line-height: 1.8; }
+    .cta-btns { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    .cta-btn-main { padding: 14px 36px; border-radius: 12px; background: var(--green); color: var(--white); border: none; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: background 0.2s; }
+    .cta-btn-main:hover { background: var(--green-light); }
+    .cta-btn-sec { padding: 14px 32px; border-radius: 12px; background: var(--white); color: var(--green); border: 2px solid var(--green); font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .cta-btn-sec:hover { background: var(--green-pale); }
+
+    /* FOOTER */
+    footer { background: var(--dark); color: rgba(255,255,255,0.6); padding: 40px 5%; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap; gap: 16px; }
+    .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--white); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--white); }
+
+    @media (max-width: 900px) { .mission-grid { grid-template-columns: 1fr; } .sdg-grid { grid-template-columns: 1fr; } .impact-grid { grid-template-columns: repeat(2,1fr); } .team-grid { grid-template-columns: repeat(2,1fr); } .nav-links { display: none; } .target-list { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Eco<span>Swap</span></a>
+  <div class="nav-links">
+    <a href="browse.html">Browse</a>
+    <a href="map.html">Map</a>
+    <a href="post.html">Post Item</a>
+    <a href="about.html" class="active">About</a>
+  </div>
+  <div class="nav-cta">
+    <a href="login.html" class="btn-outline">Login</a>
+    <a href="register.html" class="btn-primary">Register</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="sdg-badge">🌍 Aligned with UN SDG9 — Industry, Innovation & Infrastructure</div>
+  <h1>Building a <em>Sustainable</em><br/>Digital Economy</h1>
+  <p>EcoSwap is a digital platform that connects Malaysians to swap, sell, and discover second-hand items locally — reducing waste and building greener communities.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>2,400+</strong><span>Items Listed</span></div>
+    <div class="hero-stat"><strong>1,800+</strong><span>Swaps Done</span></div>
+    <div class="hero-stat"><strong>14.2T</strong><span>CO₂ Saved (kg)</span></div>
+    <div class="hero-stat"><strong>950+</strong><span>Active Users</span></div>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section class="section">
+  <div class="section-label">Our Mission</div>
+  <div class="mission-grid">
+    <div class="mission-text">
+      <h2>Why EcoSwap Exists</h2>
+      <p>Every year, millions of usable items are thrown away because people don't have a simple way to connect with others who need them. EcoSwap was built to solve this — a digital marketplace focused on sustainability, community, and innovation.</p>
+      <p>We believe technology should serve people and the planet. By making it easy to swap and sell second-hand goods locally, we reduce the demand for new production, lower carbon emissions, and build stronger local economies.</p>
+      <p>Our platform aligns directly with the United Nations Sustainable Development Goal 9 (SDG9) — promoting inclusive and sustainable industrialization, fostering innovation, and building resilient infrastructure.</p>
+    </div>
+    <div class="mission-visual">
+      <div class="mission-card"><div class="m-icon">♻️</div><h4>Reduce Waste</h4><p>Keep items in use longer</p></div>
+      <div class="mission-card"><div class="m-icon">🤝</div><h4>Build Community</h4><p>Connect local neighbours</p></div>
+      <div class="mission-card"><div class="m-icon">💡</div><h4>Drive Innovation</h4><p>Digital-first sustainability</p></div>
+      <div class="mission-card"><div class="m-icon">🌱</div><h4>Lower Emissions</h4><p>Cut carbon footprint</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SDG9 -->
+<section class="sdg-section">
+  <div class="section-label">UN Sustainable Development Goal</div>
+  <h2 style="color:var(--white);margin-bottom:12px">SDG9 — Industry, Innovation & Infrastructure</h2>
+  <p class="section-sub">EcoSwap directly addresses SDG9 by leveraging digital infrastructure to promote sustainable economic activity and foster technological innovation in local communities across Malaysia.</p>
+
+  <div class="sdg-grid">
+    <div class="sdg-card">
+      <div class="sdg-icon">🏗️</div>
+      <h3>Resilient Infrastructure</h3>
+      <p>EcoSwap builds inclusive digital infrastructure that gives all Malaysians access to a sustainable marketplace, regardless of location or income level.</p>
+    </div>
+    <div class="sdg-card">
+      <div class="sdg-icon">🏭</div>
+      <h3>Sustainable Industrialization</h3>
+      <p>By extending the lifecycle of consumer goods through swapping and reselling, EcoSwap reduces the industrial demand for new resource extraction and manufacturing.</p>
+    </div>
+    <div class="sdg-card">
+      <div class="sdg-icon">💡</div>
+      <h3>Foster Innovation</h3>
+      <p>Our platform integrates modern technologies — cloud databases, geolocation APIs, secure payments — to deliver an innovative solution to a real sustainability problem.</p>
+    </div>
+  </div>
+
+  <div class="sdg-target">
+    <h3>📋 SDG9 Targets Addressed by EcoSwap</h3>
+    <div class="target-list">
+      <div class="target-item"><span class="t-num">9.1</span><p>Develop quality, reliable, sustainable and resilient infrastructure to support economic development.</p></div>
+      <div class="target-item"><span class="t-num">9.3</span><p>Increase access of small-scale enterprises to financial services and markets.</p></div>
+      <div class="target-item"><span class="t-num">9.4</span><p>Upgrade infrastructure and retrofit industries to make them sustainable with increased resource efficiency.</p></div>
+      <div class="target-item"><span class="t-num">9.c</span><p>Significantly increase access to information and communications technology and strive to provide universal access.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section class="impact-section">
+  <div class="section-label">Measurable Impact</div>
+  <h2 style="color:var(--white);margin-bottom:12px">Our Environmental Impact</h2>
+  <p class="section-sub" style="color:rgba(255,255,255,0.7);margin-bottom:48px">Every swap on EcoSwap contributes to measurable environmental benefits tracked in real time.</p>
+  <div class="impact-grid">
+    <div class="impact-card"><div class="i-icon">🌿</div><strong>14.2T</strong><span>kg CO₂ Emissions Saved</span></div>
+    <div class="impact-card"><div class="i-icon">📦</div><strong>2,400</strong><span>Items Diverted from Landfill</span></div>
+    <div class="impact-card"><div class="i-icon">💧</div><strong>8,600</strong><span>Litres of Water Saved</span></div>
+    <div class="impact-card"><div class="i-icon">🔋</div><strong>4,200</strong><span>kWh of Energy Conserved</span></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="section-label">Platform Overview</div>
+  <h2 style="text-align:center;margin-bottom:8px">How EcoSwap Works</h2>
+  <p style="text-align:center;color:var(--muted);margin-bottom:48px;max-width:500px;margin-left:auto;margin-right:auto">A simple, secure process from listing to swap completion.</p>
+  <div class="timeline">
+    <div class="timeline-item"><div class="t-num">1</div><div class="t-content"><h3>Create Your Account</h3><p>Register securely using email or Google. Your profile and data are stored safely in Firebase with full authentication.</p></div></div>
+    <div class="timeline-item"><div class="t-num">2</div><div class="t-content"><h3>List Your Item</h3><p>Post your unused items with photos, description, condition, and location. Choose to swap or sell.</p></div></div>
+    <div class="timeline-item"><div class="t-num">3</div><div class="t-content"><h3>Browse & Discover</h3><p>Search listings by category, location, or use the interactive map to find items near you.</p></div></div>
+    <div class="timeline-item"><div class="t-num">4</div><div class="t-content"><h3>Send a Swap Request</h3><p>Found something you like? Send a swap request with a message. The seller reviews and responds.</p></div></div>
+    <div class="timeline-item"><div class="t-num">5</div><div class="t-content"><h3>Complete the Transaction</h3><p>Accept a swap or proceed to secure checkout powered by Stripe. Meet up locally or arrange delivery.</p></div></div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team-section">
+  <div class="section-label" style="text-align:center">The Team</div>
+  <h2 style="text-align:center;margin-bottom:8px">Built by UTHM Students</h2>
+  <p style="text-align:center;color:var(--muted);margin-bottom:40px">BIC 31502 — Creativity & Innovation · Session 2025/2026</p>
+  <div class="team-grid">
+    <div class="team-card"><div class="team-avatar">B</div><h4>Bashiir Mohamed</h4><p>Lead Developer & Project Manager</p></div>
+    <div class="team-card"><div class="team-avatar" style="background:#1565c0">A</div><h4>Member 2</h4><p>UI/UX & Presentation</p></div>
+    <div class="team-card"><div class="team-avatar" style="background:#9c27b0">N</div><h4>Member 3</h4><p>Report & Documentation</p></div>
+    <div class="team-card"><div class="team-avatar" style="background:#e65100">R</div><h4>Member 4</h4><p>Research & Market Analysis</p></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Ready to Start Swapping?</h2>
+  <p>Join the EcoSwap community today and be part of Malaysia's sustainable digital economy.</p>
+  <div class="cta-btns">
+    <a href="register.html" class="cta-btn-main">🌱 Join EcoSwap Free</a>
+    <a href="browse.html" class="cta-btn-sec">Browse Listings</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">EcoSwap</div>
+  <div class="footer-links">
+    <a href="about.html">About</a>
+    <a href="browse.html">Browse</a>
+    <a href="post.html">Post Item</a>
+    <a href="#">Contact</a>
+  </div>
+  <div style="font-size:0.82rem">© 2026 EcoSwap · SDG9 Aligned</div>
+</footer>
+
+</body>
+</html>

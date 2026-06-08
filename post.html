@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoSwap — Post a Listing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1a7a4a; --green-light: #25a863;
+      --green-pale: #e8f5ee; --green-mid: #b8dfc8;
+      --cream: #f9f6f0; --dark: #0f1f14;
+      --text: #1c2e20; --muted: #5a7a63;
+      --white: #ffffff;
+      --card-shadow: 0 4px 24px rgba(26,122,74,0.10);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+    nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 68px; background: rgba(249,246,240,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--green-mid); }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--green); text-decoration: none; }
+    .nav-logo span { color: var(--green-light); }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { text-decoration: none; color: var(--text); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--green); }
+    .nav-cta { display: flex; gap: 12px; }
+    .btn-outline { padding: 8px 20px; border-radius: 8px; border: 1.5px solid var(--green); color: var(--green); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-outline:hover { background: var(--green-pale); }
+
+    /* PAGE HEADER */
+    .page-header { background: var(--green); padding: 40px 5%; }
+    .page-header h1 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--white); margin-bottom: 6px; }
+    .page-header p { color: rgba(255,255,255,0.8); font-size: 0.95rem; }
+
+    /* STEPS */
+    .steps-bar { background: var(--white); border-bottom: 1px solid var(--green-mid); padding: 20px 5%; }
+    .steps { display: flex; align-items: center; gap: 0; max-width: 600px; }
+    .step { display: flex; align-items: center; gap: 10px; }
+    .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--green-pale); border: 2px solid var(--green-mid); color: var(--muted); font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s; }
+    .step.active .step-num { background: var(--green); border-color: var(--green); color: var(--white); }
+    .step.done .step-num { background: var(--green-light); border-color: var(--green-light); color: var(--white); }
+    .step-label { font-size: 0.85rem; font-weight: 500; color: var(--muted); }
+    .step.active .step-label { color: var(--green); font-weight: 600; }
+    .step-line { flex: 1; height: 2px; background: var(--green-mid); margin: 0 12px; min-width: 40px; }
+
+    /* MAIN LAYOUT */
+    .post-layout { display: grid; grid-template-columns: 1fr 340px; gap: 32px; padding: 40px 5%; max-width: 1100px; margin: 0 auto; }
+
+    /* FORM */
+    .form-card { background: var(--white); border-radius: 16px; border: 1px solid var(--green-mid); padding: 32px; box-shadow: var(--card-shadow); }
+    .form-card h2 { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--dark); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--green-mid); }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .form-group label span { color: #e53935; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border: 1.5px solid var(--green-mid); border-radius: 10px; outline: none; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--text); background: var(--cream); transition: border-color 0.2s, box-shadow 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(26,122,74,0.1); background: var(--white); }
+    .form-group textarea { resize: vertical; min-height: 120px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .hint { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+
+    /* IMAGE UPLOAD */
+    .upload-area { border: 2px dashed var(--green-mid); border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--cream); }
+    .upload-area:hover { border-color: var(--green); background: var(--green-pale); }
+    .upload-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .upload-area h4 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .upload-area p { font-size: 0.82rem; color: var(--muted); }
+    .upload-area input { display: none; }
+    .preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
+    .preview-img { width: 100%; aspect-ratio: 1; border-radius: 8px; background: var(--green-pale); border: 1px solid var(--green-mid); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+
+    /* TYPE TOGGLE */
+    .type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .type-option { border: 2px solid var(--green-mid); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .type-option:hover { border-color: var(--green); background: var(--green-pale); }
+    .type-option.selected { border-color: var(--green); background: var(--green-pale); }
+    .type-option .type-icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .type-option h4 { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .type-option p { font-size: 0.78rem; color: var(--muted); }
+
+    /* SWAP TAGS INPUT */
+    .tags-input { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; border: 1.5px solid var(--green-mid); border-radius: 10px; background: var(--cream); min-height: 48px; cursor: text; }
+    .tag-item { background: var(--green-pale); color: var(--green); padding: 4px 10px; border-radius: 20px; font-size: 0.82rem; display: flex; align-items: center; gap: 6px; }
+    .tag-item button { background: none; border: none; cursor: pointer; color: var(--green); font-size: 0.9rem; padding: 0; line-height: 1; }
+    .tags-input input { border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; background: transparent; min-width: 120px; flex: 1; }
+
+    /* SUBMIT BUTTONS */
+    .form-actions { display: flex; gap: 12px; margin-top: 8px; }
+    .btn-submit { flex: 1; padding: 14px; border-radius: 12px; background: var(--green); color: var(--white); border: none; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn-submit:hover { background: var(--green-light); }
+    .btn-draft { padding: 14px 24px; border-radius: 12px; background: var(--white); color: var(--muted); border: 1.5px solid var(--green-mid); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-draft:hover { border-color: var(--green); color: var(--green); }
+
+    /* PREVIEW SIDEBAR */
+    .preview-sidebar {}
+    .preview-card { background: var(--white); border-radius: 16px; border: 1px solid var(--green-mid); overflow: hidden; box-shadow: var(--card-shadow); position: sticky; top: 88px; }
+    .preview-card-img { height: 200px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 5rem; }
+    .preview-card-body { padding: 20px; }
+    .preview-card-body h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .preview-loc { font-size: 0.82rem; color: var(--muted); margin-bottom: 12px; }
+    .preview-badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; background: var(--green-pale); color: var(--green); border: 1px solid var(--green-mid); margin-bottom: 12px; }
+    .tips-card { background: var(--green-pale); border: 1px solid var(--green-mid); border-radius: 14px; padding: 20px; margin-top: 20px; }
+    .tips-card h4 { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--green); margin-bottom: 12px; }
+    .tips-card ul { list-style: none; }
+    .tips-card li { font-size: 0.83rem; color: var(--text); margin-bottom: 8px; display: flex; gap: 8px; }
+    .tips-card li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+
+    /* SUCCESS */
+    .success-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .success-overlay.open { display: flex; }
+    .success-modal { background: var(--white); border-radius: 20px; padding: 48px 40px; text-align: center; max-width: 420px; width: 90%; }
+    .success-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .success-modal h3 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--dark); margin-bottom: 10px; }
+    .success-modal p { color: var(--muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 28px; }
+    .success-btns { display: flex; gap: 12px; }
+    .success-btns a { flex: 1; padding: 12px; border-radius: 10px; text-decoration: none; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; font-weight: 600; text-align: center; transition: all 0.2s; }
+    .s-browse { background: var(--green); color: var(--white); }
+    .s-post { background: var(--white); color: var(--green); border: 1.5px solid var(--green); }
+
+    @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; } .preview-sidebar { display: none; } .nav-links { display: none; } }
+    @media (max-width: 560px) { .form-row-2 { grid-template-columns: 1fr; } .type-toggle { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Eco<span>Swap</span></a>
+  <div class="nav-links">
+    <a href="browse.html">Browse</a>
+    <a href="map.html">Map</a>
+    <a href="post.html">Post Item</a>
+    <a href="about.html">About</a>
+  </div>
+  <div class="nav-cta">
+    <a href="login.html" class="btn-outline">Login</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Post a Listing</h1>
+  <p>Share your unused items with the community — swap or sell sustainably.</p>
+</div>
+
+<div class="steps-bar">
+  <div class="steps">
+    <div class="step active" id="step1">
+      <div class="step-num">1</div>
+      <div class="step-label">Item Details</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step2">
+      <div class="step-num">2</div>
+      <div class="step-label">Photos</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step3">
+      <div class="step-num">3</div>
+      <div class="step-label">Preferences</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step4">
+      <div class="step-num">4</div>
+      <div class="step-label">Review</div>
+    </div>
+  </div>
+</div>
+
+<div class="post-layout">
+  <div>
+    <!-- SECTION 1: ITEM DETAILS -->
+    <div class="form-card" style="margin-bottom:24px">
+      <h2>📋 Item Details</h2>
+
+      <div class="form-group">
+        <label>Item Title <span>*</span></label>
+        <input type="text" id="itemTitle" placeholder="e.g. Samsung Galaxy Tab A8 (64GB)" oninput="updatePreview()" />
+        <p class="hint">Be specific — good titles get more views.</p>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>Category <span>*</span></label>
+          <select id="itemCategory">
+            <option value="">Select category</option>
+            <option>Electronics</option>
+            <option>Clothing</option>
+            <option>Books</option>
+            <option>Furniture</option>
+            <option>Sports</option>
+            <option>Toys</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Condition <span>*</span></label>
+          <select id="itemCondition">
+            <option value="">Select condition</option>
+            <option>Like New</option>
+            <option>Good</option>
+            <option>Fair</option>
+            <option>For Parts</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description <span>*</span></label>
+        <textarea id="itemDesc" placeholder="Describe your item — include brand, model, age, any defects, and what comes with it..."></textarea>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>State <span>*</span></label>
+          <select id="itemState" oninput="updatePreview()">
+            <option value="">Select state</option>
+            <option>Johor</option><option>Kedah</option><option>Kelantan</option>
+            <option>Kuala Lumpur</option><option>Melaka</option><option>Penang</option>
+            <option>Perak</option><option>Sabah</option><option>Sarawak</option><option>Selangor</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>City / Area</label>
+          <input type="text" id="itemCity" placeholder="e.g. Batu Pahat" oninput="updatePreview()" />
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: PHOTOS -->
+    <div class="form-card" style="margin-bottom:24px">
+      <h2>📸 Photos</h2>
+      <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-icon">🖼️</div>
+        <h4>Click to upload photos</h4>
+        <p>PNG, JPG up to 5MB each · Max 4 photos</p>
+        <input type="file" id="fileInput" multiple accept="image/*" onchange="previewImages(event)" />
+      </div>
+      <div class="preview-grid" id="previewGrid">
+        <div class="preview-img">+</div>
+        <div class="preview-img">+</div>
+        <div class="preview-img">+</div>
+        <div class="preview-img">+</div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: LISTING TYPE -->
+    <div class="form-card" style="margin-bottom:24px">
+      <h2>🔄 Listing Type</h2>
+      <div class="type-toggle">
+        <div class="type-option selected" id="typeSwap" onclick="selectType('swap')">
+          <div class="type-icon">🔄</div>
+          <h4>Swap</h4>
+          <p>Exchange your item for something else</p>
+        </div>
+        <div class="type-option" id="typeBuy" onclick="selectType('buy')">
+          <div class="type-icon">💰</div>
+          <h4>Sell</h4>
+          <p>Set a price and sell your item</p>
+        </div>
+      </div>
+
+      <div style="margin-top:20px" id="priceGroup">
+        <div class="form-group" id="priceField" style="display:none">
+          <label>Price (RM) <span>*</span></label>
+          <input type="number" id="itemPrice" placeholder="e.g. 150" min="0" />
+        </div>
+        <div class="form-group" id="swapField">
+          <label>What would you like in return?</label>
+          <div class="tags-input" id="tagsInput" onclick="document.getElementById('tagInputField').focus()">
+            <input type="text" id="tagInputField" placeholder="Type and press Enter..." onkeydown="addTag(event)" />
+          </div>
+          <p class="hint">Press Enter after each item. e.g. Smartphone, Laptop, Books</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-draft">Save as Draft</button>
+      <button class="btn-submit" onclick="submitListing()">🚀 Publish Listing</button>
+    </div>
+  </div>
+
+  <!-- PREVIEW SIDEBAR -->
+  <div class="preview-sidebar">
+    <div class="preview-card">
+      <div class="preview-card-img">📦</div>
+      <div class="preview-card-body">
+        <h3 id="previewTitle">Your item title</h3>
+        <p class="preview-loc" id="previewLoc">📍 Your location</p>
+        <span class="preview-badge" id="previewBadge">Swap</span>
+        <p style="font-size:0.82rem;color:var(--muted)">This is how your listing will appear to other users.</p>
+      </div>
+    </div>
+
+    <div class="tips-card">
+      <h4>💡 Tips for a great listing</h4>
+      <ul>
+        <li>Use clear, well-lit photos</li>
+        <li>Be honest about the condition</li>
+        <li>Include brand and model name</li>
+        <li>Mention what accessories are included</li>
+        <li>Respond to requests quickly</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-modal">
+    <div class="success-icon">🎉</div>
+    <h3>Listing Published!</h3>
+    <p>Your item is now live on EcoSwap. Other users can find it and send swap requests or buy it.</p>
+    <div class="success-btns">
+      <a href="browse.html" class="s-browse">Browse Listings</a>
+      <a href="post.html" class="s-post">Post Another</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  let selectedType = 'swap';
+  let tags = [];
+
+  function selectType(type) {
+    selectedType = type;
+    document.getElementById('typeSwap').classList.toggle('selected', type === 'swap');
+    document.getElementById('typeBuy').classList.toggle('selected', type === 'buy');
+    document.getElementById('priceField').style.display = type === 'buy' ? 'block' : 'none';
+    document.getElementById('swapField').style.display = type === 'swap' ? 'block' : 'none';
+    document.getElementById('previewBadge').textContent = type === 'swap' ? 'Swap' : 'Buy';
+  }
+
+  function addTag(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const val = e.target.value.trim();
+      if (val && !tags.includes(val)) {
+        tags.push(val);
+        renderTags();
+      }
+      e.target.value = '';
+    }
+  }
+
+  function renderTags() {
+    const container = document.getElementById('tagsInput');
+    const input = document.getElementById('tagInputField');
+    container.innerHTML = '';
+    tags.forEach((tag, i) => {
+      const el = document.createElement('span');
+      el.className = 'tag-item';
+      el.innerHTML = `${tag} <button onclick="removeTag(${i})">×</button>`;
+      container.appendChild(el);
+    });
+    container.appendChild(input);
+  }
+
+  function removeTag(i) {
+    tags.splice(i, 1);
+    renderTags();
+  }
+
+  function updatePreview() {
+    const title = document.getElementById('itemTitle').value || 'Your item title';
+    const city = document.getElementById('itemCity').value;
+    const state = document.getElementById('itemState').value;
+    document.getElementById('previewTitle').textContent = title;
+    document.getElementById('previewLoc').textContent = '📍 ' + (city && state ? `${city}, ${state}` : state || city || 'Your location');
+  }
+
+  function previewImages(e) {
+    const files = Array.from(e.target.files).slice(0, 4);
+    const grid = document.getElementById('previewGrid');
+    grid.innerHTML = '';
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const div = document.createElement('div');
+        div.className = 'preview-img';
+        div.style.backgroundImage = `url(${ev.target.result})`;
+        div.style.backgroundSize = 'cover';
+        div.style.backgroundPosition = 'center';
+        grid.appendChild(div);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function submitListing() {
+    const title = document.getElementById('itemTitle').value.trim();
+    const category = document.getElementById('itemCategory').value;
+    const desc = document.getElementById('itemDesc').value.trim();
+    if (!title || !category || !desc) {
+      alert('Please fill in the required fields: Title, Category, and Description.');
+      return;
+    }
+    document.getElementById('successOverlay').classList.add('open');
+  }
+</script>
+
+</body>
+</html>

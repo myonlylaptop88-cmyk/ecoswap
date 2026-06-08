@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoSwap — Item Detail</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1a7a4a; --green-light: #25a863;
+      --green-pale: #e8f5ee; --green-mid: #b8dfc8;
+      --cream: #f9f6f0; --dark: #0f1f14;
+      --text: #1c2e20; --muted: #5a7a63;
+      --white: #ffffff;
+      --card-shadow: 0 4px 24px rgba(26,122,74,0.10);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+    nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 68px; background: rgba(249,246,240,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--green-mid); }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--green); text-decoration: none; }
+    .nav-logo span { color: var(--green-light); }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { text-decoration: none; color: var(--text); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--green); }
+    .nav-cta { display: flex; gap: 12px; }
+    .btn-outline { padding: 8px 20px; border-radius: 8px; border: 1.5px solid var(--green); color: var(--green); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-outline:hover { background: var(--green-pale); }
+    .btn-primary { padding: 8px 20px; border-radius: 8px; background: var(--green); color: var(--white); border: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--green-light); }
+
+    /* BREADCRUMB */
+    .breadcrumb { padding: 16px 5%; font-size: 0.85rem; color: var(--muted); }
+    .breadcrumb a { color: var(--green); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb span { margin: 0 8px; }
+
+    /* MAIN */
+    .item-layout { display: grid; grid-template-columns: 1fr 420px; gap: 40px; padding: 0 5% 60px; max-width: 1200px; margin: 0 auto; }
+
+    /* IMAGE SECTION */
+    .image-section {}
+    .main-img { width: 100%; height: 420px; background: var(--green-pale); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 8rem; border: 1px solid var(--green-mid); margin-bottom: 16px; position: relative; overflow: hidden; }
+    .img-badge { position: absolute; top: 16px; left: 16px; padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; }
+    .badge-swap { background: var(--green-pale); color: var(--green); border: 1px solid var(--green-mid); }
+    .badge-buy { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+    .thumb-row { display: flex; gap: 12px; }
+    .thumb { width: 80px; height: 80px; border-radius: 10px; background: var(--green-pale); border: 2px solid var(--green-mid); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; cursor: pointer; transition: border-color 0.2s; }
+    .thumb.active, .thumb:hover { border-color: var(--green); }
+
+    /* DETAIL SECTION */
+    .detail-section {}
+    .item-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+    .meta-tag { padding: 4px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; background: var(--green-pale); color: var(--green); border: 1px solid var(--green-mid); }
+    .item-title { font-family: 'Syne', sans-serif; font-size: 1.9rem; font-weight: 800; color: var(--dark); margin-bottom: 8px; line-height: 1.2; }
+    .item-price { font-size: 1.5rem; font-weight: 700; color: var(--green); margin-bottom: 16px; }
+    .item-loc { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; color: var(--muted); margin-bottom: 20px; }
+    .item-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+    .stat-box { background: var(--white); border: 1px solid var(--green-mid); border-radius: 10px; padding: 12px; text-align: center; }
+    .stat-box .stat-val { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--dark); display: block; }
+    .stat-box .stat-lbl { font-size: 0.75rem; color: var(--muted); }
+
+    .section-title { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 10px; }
+    .item-desc { font-size: 0.92rem; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+
+    /* SWAP WANTS */
+    .swap-wants { background: var(--green-pale); border: 1px solid var(--green-mid); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+    .swap-wants h4 { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--green); margin-bottom: 10px; }
+    .swap-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .swap-tag { padding: 4px 12px; border-radius: 20px; background: var(--white); border: 1px solid var(--green-mid); font-size: 0.8rem; color: var(--text); }
+
+    /* ACTION BUTTONS */
+    .action-btns { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+    .btn-swap { width: 100%; padding: 14px; border-radius: 12px; background: var(--green); color: var(--white); border: none; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-swap:hover { background: var(--green-light); }
+    .btn-buy { width: 100%; padding: 14px; border-radius: 12px; background: var(--white); color: var(--green); border: 2px solid var(--green); font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-buy:hover { background: var(--green-pale); }
+    .btn-msg { width: 100%; padding: 12px; border-radius: 12px; background: transparent; color: var(--muted); border: 1.5px solid var(--green-mid); font-family: 'DM Sans', sans-serif; font-size: 0.92rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-msg:hover { border-color: var(--green); color: var(--green); }
+
+    /* SELLER CARD */
+    .seller-card { background: var(--white); border: 1px solid var(--green-mid); border-radius: 14px; padding: 20px; display: flex; align-items: center; gap: 16px; }
+    .seller-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--white); font-family: 'Syne', sans-serif; font-weight: 800; flex-shrink: 0; }
+    .seller-info h4 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .seller-info p { font-size: 0.8rem; color: var(--muted); }
+    .seller-rating { margin-left: auto; text-align: right; }
+    .stars { color: #f59e0b; font-size: 0.9rem; }
+    .rating-count { font-size: 0.75rem; color: var(--muted); }
+
+    /* SIMILAR */
+    .similar-section { padding: 40px 5%; border-top: 1px solid var(--green-mid); }
+    .similar-section h2 { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--dark); margin-bottom: 24px; }
+    .similar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .sim-card { background: var(--white); border-radius: 12px; overflow: hidden; border: 1px solid var(--green-mid); box-shadow: var(--card-shadow); cursor: pointer; transition: transform 0.2s; text-decoration: none; color: inherit; display: block; }
+    .sim-card:hover { transform: translateY(-3px); }
+    .sim-img { height: 110px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 2.4rem; }
+    .sim-body { padding: 12px; }
+    .sim-body h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: var(--dark); }
+    .sim-body p { font-size: 0.78rem; color: var(--muted); }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--white); border-radius: 20px; padding: 36px; width: 90%; max-width: 480px; }
+    .modal h3 { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+    .modal p { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; line-height: 1.6; }
+    .modal textarea { width: 100%; padding: 12px 16px; border: 1.5px solid var(--green-mid); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--text); resize: vertical; min-height: 100px; outline: none; margin-bottom: 16px; }
+    .modal textarea:focus { border-color: var(--green); }
+    .modal-btns { display: flex; gap: 12px; }
+    .modal-btns button { flex: 1; padding: 12px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .modal-cancel { background: var(--white); color: var(--muted); border: 1.5px solid var(--green-mid); }
+    .modal-confirm { background: var(--green); color: var(--white); border: none; }
+    .modal-confirm:hover { background: var(--green-light); }
+
+    @media (max-width: 900px) { .item-layout { grid-template-columns: 1fr; } .similar-grid { grid-template-columns: repeat(2,1fr); } .nav-links { display: none; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Eco<span>Swap</span></a>
+  <div class="nav-links">
+    <a href="browse.html">Browse</a>
+    <a href="map.html">Map</a>
+    <a href="post.html">Post Item</a>
+    <a href="about.html">About</a>
+  </div>
+  <div class="nav-cta">
+    <a href="login.html" class="btn-outline">Login</a>
+    <a href="post.html" class="btn-primary">+ Post Item</a>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <a href="index.html">Home</a><span>›</span>
+  <a href="browse.html">Browse</a><span>›</span>
+  <a href="browse.html">Electronics</a><span>›</span>
+  Samsung Galaxy Tab A8
+</div>
+
+<div class="item-layout">
+  <!-- IMAGE -->
+  <div class="image-section">
+    <div class="main-img">
+      📱
+      <span class="img-badge badge-swap">Swap</span>
+    </div>
+    <div class="thumb-row">
+      <div class="thumb active">📱</div>
+      <div class="thumb">🔋</div>
+      <div class="thumb">📦</div>
+      <div class="thumb">🧾</div>
+    </div>
+  </div>
+
+  <!-- DETAILS -->
+  <div class="detail-section">
+    <div class="item-meta">
+      <span class="meta-tag">Electronics</span>
+      <span class="meta-tag">Like New</span>
+      <span class="meta-tag">Swap</span>
+    </div>
+    <h1 class="item-title">Samsung Galaxy Tab A8</h1>
+    <div class="item-price">Open to offers</div>
+    <div class="item-loc">📍 Batu Pahat, Johor &nbsp;·&nbsp; Listed 2 hours ago</div>
+
+    <div class="item-stats">
+      <div class="stat-box"><span class="stat-val">Like New</span><span class="stat-lbl">Condition</span></div>
+      <div class="stat-box"><span class="stat-val">3</span><span class="stat-lbl">Interested</span></div>
+      <div class="stat-box"><span class="stat-val">47</span><span class="stat-lbl">Views</span></div>
+    </div>
+
+    <div class="section-title">Description</div>
+    <p class="item-desc">Samsung Galaxy Tab A8 in like-new condition. Purchased 6 months ago, barely used. Comes with original box, charger, and screen protector already applied. No scratches or dents. Running Android 13, 64GB storage, 4GB RAM. Great for students or anyone who needs a reliable tablet.</p>
+
+    <div class="swap-wants">
+      <h4>🔄 Open to swapping for:</h4>
+      <div class="swap-tags">
+        <span class="swap-tag">📱 Smartphones</span>
+        <span class="swap-tag">💻 Laptops</span>
+        <span class="swap-tag">🎧 Earbuds / Headphones</span>
+        <span class="swap-tag">📚 Textbooks</span>
+      </div>
+    </div>
+
+    <div class="action-btns">
+      <button class="btn-swap" onclick="openModal('swap')">🔄 Send Swap Request</button>
+      <button class="btn-buy" onclick="window.location.href='checkout.html'">💳 Buy Now</button>
+      <button class="btn-msg" onclick="openModal('msg')">💬 Message Seller</button>
+    </div>
+
+    <div class="seller-card">
+      <div class="seller-avatar">A</div>
+      <div class="seller-info">
+        <h4>Ahmad Faiz</h4>
+        <p>Member since Jan 2025 · 12 swaps</p>
+      </div>
+      <div class="seller-rating">
+        <div class="stars">★★★★★</div>
+        <div class="rating-count">4.9 (28 reviews)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SIMILAR ITEMS -->
+<div class="similar-section">
+  <h2>Similar Listings</h2>
+  <div class="similar-grid">
+    <a href="item.html" class="sim-card">
+      <div class="sim-img">📱</div>
+      <div class="sim-body"><h4>iPhone 12 (128GB)</h4><p>Subang Jaya · Swap</p></div>
+    </a>
+    <a href="item.html" class="sim-card">
+      <div class="sim-img">🎮</div>
+      <div class="sim-body"><h4>PS4 Controller</h4><p>Kota Kinabalu · RM 95</p></div>
+    </a>
+    <a href="item.html" class="sim-card">
+      <div class="sim-img">💻</div>
+      <div class="sim-body"><h4>Laptop Stand</h4><p>Penang · RM 45</p></div>
+    </a>
+    <a href="item.html" class="sim-card">
+      <div class="sim-img">🎧</div>
+      <div class="sim-body"><h4>Sony Headphones</h4><p>KL · Swap</p></div>
+    </a>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalTitle">Send Swap Request</h3>
+    <p id="modalDesc">Describe what you'd like to offer in exchange. The seller will review your request and respond.</p>
+    <textarea id="modalText" placeholder="I'd like to swap my..."></textarea>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-confirm" onclick="confirmAction()">Send Request</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentAction = '';
+  function openModal(type) {
+    currentAction = type;
+    const overlay = document.getElementById('modalOverlay');
+    const title = document.getElementById('modalTitle');
+    const desc = document.getElementById('modalDesc');
+    const placeholder = document.getElementById('modalText');
+    if (type === 'swap') {
+      title.textContent = '🔄 Send Swap Request';
+      desc.textContent = "Describe what you'd like to offer in exchange. The seller will review your request and respond.";
+      placeholder.placeholder = "I'd like to swap my...";
+    } else {
+      title.textContent = '💬 Message Seller';
+      desc.textContent = 'Send a message to the seller. Be respectful and clear about your interest.';
+      placeholder.placeholder = 'Hi, I am interested in your item...';
+    }
+    overlay.classList.add('open');
+  }
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+  function confirmAction() {
+    alert(currentAction === 'swap' ? 'Swap request sent! Check your requests page.' : 'Message sent to seller!');
+    closeModal();
+  }
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
+
+</body>
+</html>

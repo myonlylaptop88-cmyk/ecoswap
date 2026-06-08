@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoSwap — Swap Requests</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1a7a4a; --green-light: #25a863;
+      --green-pale: #e8f5ee; --green-mid: #b8dfc8;
+      --cream: #f9f6f0; --dark: #0f1f14;
+      --text: #1c2e20; --muted: #5a7a63;
+      --white: #ffffff;
+      --card-shadow: 0 4px 24px rgba(26,122,74,0.10);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+    nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 68px; background: rgba(249,246,240,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--green-mid); }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--green); text-decoration: none; }
+    .nav-logo span { color: var(--green-light); }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { text-decoration: none; color: var(--text); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--green); }
+    .nav-cta { display: flex; gap: 12px; }
+    .btn-outline { padding: 8px 20px; border-radius: 8px; border: 1.5px solid var(--green); color: var(--green); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-outline:hover { background: var(--green-pale); }
+    .btn-primary { padding: 8px 20px; border-radius: 8px; background: var(--green); color: var(--white); border: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--green-light); }
+
+    /* PAGE HEADER */
+    .page-header { background: var(--green); padding: 36px 5%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .page-header h1 { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--white); margin-bottom: 4px; }
+    .page-header p { color: rgba(255,255,255,0.8); font-size: 0.92rem; }
+    .header-stats { display: flex; gap: 20px; }
+    .h-stat { text-align: center; background: rgba(255,255,255,0.15); border-radius: 10px; padding: 10px 20px; }
+    .h-stat strong { display: block; font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--white); }
+    .h-stat span { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+
+    /* MAIN */
+    .main-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 5%; }
+
+    /* TABS */
+    .tabs { display: flex; gap: 4px; background: var(--white); border-radius: 12px; padding: 4px; border: 1px solid var(--green-mid); margin-bottom: 28px; box-shadow: var(--card-shadow); width: fit-content; }
+    .tab { padding: 9px 20px; border-radius: 8px; border: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+    .tab.active { background: var(--green); color: var(--white); font-weight: 600; }
+    .tab:hover:not(.active) { background: var(--green-pale); color: var(--green); }
+    .tab-badge { background: rgba(255,255,255,0.3); color: var(--white); font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 8px; }
+    .tab:not(.active) .tab-badge { background: var(--green-pale); color: var(--green); }
+
+    /* TAB CONTENT */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* REQUEST CARD */
+    .request-card { background: var(--white); border-radius: 16px; border: 1px solid var(--green-mid); padding: 24px; box-shadow: var(--card-shadow); margin-bottom: 16px; transition: box-shadow 0.2s; }
+    .request-card:hover { box-shadow: 0 8px 32px rgba(26,122,74,0.15); }
+    .request-card.incoming { border-left: 4px solid var(--green); }
+    .request-card.outgoing { border-left: 4px solid #f59e0b; }
+    .request-card.completed { border-left: 4px solid #9c27b0; opacity: 0.85; }
+
+    .req-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+    .req-user { display: flex; align-items: center; gap: 12px; }
+    .req-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800; color: var(--white); flex-shrink: 0; }
+    .req-user-info h4 { font-family: 'Syne', sans-serif; font-size: 0.92rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .req-user-info p { font-size: 0.78rem; color: var(--muted); }
+    .req-status { padding: 5px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; }
+    .rs-pending { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+    .rs-accepted { background: var(--green-pale); color: var(--green); border: 1px solid var(--green-mid); }
+    .rs-declined { background: #fdecea; color: #c62828; border: 1px solid #ef9a9a; }
+    .rs-completed { background: #f3e5f5; color: #7b1fa2; border: 1px solid #ce93d8; }
+
+    /* SWAP ITEMS */
+    .swap-items { display: flex; align-items: center; gap: 16px; background: var(--cream); border-radius: 12px; padding: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+    .swap-item { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 180px; }
+    .swap-item-img { width: 52px; height: 52px; border-radius: 10px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; border: 1px solid var(--green-mid); }
+    .swap-item-info h5 { font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .swap-item-info p { font-size: 0.75rem; color: var(--muted); }
+    .swap-arrow { font-size: 1.4rem; color: var(--green); font-weight: 700; flex-shrink: 0; }
+
+    .req-message { background: var(--green-pale); border-radius: 10px; padding: 12px 16px; font-size: 0.88rem; color: var(--text); line-height: 1.6; margin-bottom: 16px; border-left: 3px solid var(--green); }
+    .req-message strong { font-weight: 600; color: var(--green); display: block; margin-bottom: 4px; font-size: 0.8rem; }
+
+    .req-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-accept { padding: 9px 24px; border-radius: 8px; background: var(--green); color: var(--white); border: none; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn-accept:hover { background: var(--green-light); }
+    .btn-decline { padding: 9px 24px; border-radius: 8px; background: var(--white); color: #c62828; border: 1.5px solid #ef9a9a; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-decline:hover { background: #fdecea; }
+    .btn-view { padding: 9px 20px; border-radius: 8px; background: var(--white); color: var(--green); border: 1.5px solid var(--green-mid); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
+    .btn-view:hover { background: var(--green-pale); border-color: var(--green); }
+    .btn-msg { padding: 9px 20px; border-radius: 8px; background: var(--white); color: var(--muted); border: 1.5px solid var(--green-mid); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-msg:hover { border-color: var(--green); color: var(--green); }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .empty-state h3 { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .empty-state p { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--dark); color: var(--white); padding: 12px 20px; border-radius: 10px; font-size: 0.9rem; font-weight: 500; z-index: 999; transform: translateY(80px); opacity: 0; transition: all 0.3s; display: flex; align-items: center; gap: 10px; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--green); }
+    .toast.error { background: #c62828; }
+
+    @media (max-width: 768px) { .nav-links { display: none; } .swap-items { flex-direction: column; } .header-stats { display: none; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Eco<span>Swap</span></a>
+  <div class="nav-links">
+    <a href="browse.html">Browse</a>
+    <a href="map.html">Map</a>
+    <a href="post.html">Post Item</a>
+    <a href="profile.html">Profile</a>
+  </div>
+  <div class="nav-cta">
+    <a href="profile.html" class="btn-outline">My Profile</a>
+    <a href="dashboard.html" class="btn-primary">Dashboard</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div>
+    <h1>Swap Requests</h1>
+    <p>Manage incoming and outgoing swap requests</p>
+  </div>
+  <div class="header-stats">
+    <div class="h-stat"><strong>3</strong><span>Incoming</span></div>
+    <div class="h-stat"><strong>2</strong><span>Outgoing</span></div>
+    <div class="h-stat"><strong>7</strong><span>Completed</span></div>
+  </div>
+</div>
+
+<div class="main-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('incoming', this)">
+      📨 Incoming <span class="tab-badge">3</span>
+    </button>
+    <button class="tab" onclick="switchTab('outgoing', this)">
+      📤 Outgoing <span class="tab-badge">2</span>
+    </button>
+    <button class="tab" onclick="switchTab('completed', this)">
+      ✅ Completed <span class="tab-badge">7</span>
+    </button>
+  </div>
+
+  <!-- INCOMING -->
+  <div class="tab-content active" id="tab-incoming">
+
+    <div class="request-card incoming">
+      <div class="req-header">
+        <div class="req-user">
+          <div class="req-avatar">F</div>
+          <div class="req-user-info">
+            <h4>Ahmad Faiz</h4>
+            <p>⭐ 4.8 · 15 swaps · Batu Pahat, Johor · 2 hours ago</p>
+          </div>
+        </div>
+        <span class="req-status rs-pending">Pending</span>
+      </div>
+      <div class="swap-items">
+        <div class="swap-item">
+          <div class="swap-item-img">🚲</div>
+          <div class="swap-item-info">
+            <h5>Your: Mountain Bicycle</h5>
+            <p>Sports · RM 350 value</p>
+          </div>
+        </div>
+        <div class="swap-arrow">⇄</div>
+        <div class="swap-item">
+          <div class="swap-item-img">🎸</div>
+          <div class="swap-item-info">
+            <h5>Their offer: Acoustic Guitar</h5>
+            <p>Music · Like New condition</p>
+          </div>
+        </div>
+      </div>
+      <div class="req-message">
+        <strong>Message from Ahmad Faiz:</strong>
+        Hi! I'm very interested in your mountain bicycle. I have an acoustic guitar in like-new condition that I barely use. Would love to swap if you're interested!
+      </div>
+      <div class="req-actions">
+        <button class="btn-accept" onclick="handleAction('accept', this)">✅ Accept</button>
+        <button class="btn-decline" onclick="handleAction('decline', this)">✗ Decline</button>
+        <a href="item.html" class="btn-view">👁️ View Item</a>
+        <button class="btn-msg">💬 Message</button>
+      </div>
+    </div>
+
+    <div class="request-card incoming">
+      <div class="req-header">
+        <div class="req-user">
+          <div class="req-avatar" style="background:#9c27b0">N</div>
+          <div class="req-user-info">
+            <h4>Nurul Ain</h4>
+            <p>⭐ 4.6 · 8 swaps · Muar, Johor · 5 hours ago</p>
+          </div>
+        </div>
+        <span class="req-status rs-pending">Pending</span>
+      </div>
+      <div class="swap-items">
+        <div class="swap-item">
+          <div class="swap-item-img">📱</div>
+          <div class="swap-item-info">
+            <h5>Your: Samsung Galaxy Tab A8</h5>
+            <p>Electronics · Like New</p>
+          </div>
+        </div>
+        <div class="swap-arrow">⇄</div>
+        <div class="swap-item">
+          <div class="swap-item-img">💻</div>
+          <div class="swap-item-info">
+            <h5>Their offer: Laptop Stand + RM 50</h5>
+            <p>Accessories · Good condition</p>
+          </div>
+        </div>
+      </div>
+      <div class="req-message">
+        <strong>Message from Nurul Ain:</strong>
+        Salam! I'd like to swap my laptop stand plus RM 50 cash for your Samsung Tab. The stand is brand new, never used. Let me know if this works!
+      </div>
+      <div class="req-actions">
+        <button class="btn-accept" onclick="handleAction('accept', this)">✅ Accept</button>
+        <button class="btn-decline" onclick="handleAction('decline', this)">✗ Decline</button>
+        <a href="item.html" class="btn-view">👁️ View Item</a>
+        <button class="btn-msg">💬 Message</button>
+      </div>
+    </div>
+
+    <div class="request-card incoming">
+      <div class="req-header">
+        <div class="req-user">
+          <div class="req-avatar" style="background:#e65100">R</div>
+          <div class="req-user-info">
+            <h4>Rauf Haziq</h4>
+            <p>⭐ 4.4 · 5 swaps · Skudai, Johor · Yesterday</p>
+          </div>
+        </div>
+        <span class="req-status rs-pending">Pending</span>
+      </div>
+      <div class="swap-items">
+        <div class="swap-item">
+          <div class="swap-item-img">📚</div>
+          <div class="swap-item-info">
+            <h5>Your: Engineering Textbooks</h5>
+            <p>Books · Good condition</p>
+          </div>
+        </div>
+        <div class="swap-arrow">⇄</div>
+        <div class="swap-item">
+          <div class="swap-item-img">📖</div>
+          <div class="swap-item-info">
+            <h5>Their offer: Harry Potter Book Set</h5>
+            <p>Books · Like New</p>
+          </div>
+        </div>
+      </div>
+      <div class="req-message">
+        <strong>Message from Rauf Haziq:</strong>
+        Hey! I need those engineering textbooks for my semester. Willing to swap with my Harry Potter complete set — all 7 books in great condition!
+      </div>
+      <div class="req-actions">
+        <button class="btn-accept" onclick="handleAction('accept', this)">✅ Accept</button>
+        <button class="btn-decline" onclick="handleAction('decline', this)">✗ Decline</button>
+        <a href="item.html" class="btn-view">👁️ View Item</a>
+        <button class="btn-msg">💬 Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OUTGOING -->
+  <div class="tab-content" id="tab-outgoing">
+    <div class="request-card outgoing">
+      <div class="req-header">
+        <div class="req-user">
+          <div class="req-avatar" style="background:#1565c0">K</div>
+          <div class="req-user-info">
+            <h4>Sent to: Khairul</h4>
+            <p>Johor Bahru · Sent 3 days ago</p>
+          </div>
+        </div>
+        <span class="req-status rs-pending">Awaiting Reply</span>
+      </div>
+      <div class="swap-items">
+        <div class="swap-item">
+          <div class="swap-item-img">👟</div>
+          <div class="swap-item-info">
+            <h5>Your offer: Nike Running Shoes</h5>
+            <p>Clothing · Size 42 · Good</p>
+          </div>
+        </div>
+        <div class="swap-arrow">⇄</div>
+        <div class="swap-item">
+          <div class="swap-item-img">🧥</div>
+          <div class="swap-item-info">
+            <h5>Requesting: Winter Jacket (XL)</h5>
+            <p>Clothing · RM 65 value</p>
+          </div>
+        </div>
+      </div>
+      <div class="req-message">
+        <strong>Your message:</strong>
+        Hi Khairul! I'd love to swap my Nike running shoes (size 42, barely used) for your winter jacket. Let me know if this interests you!
+      </div>
+      <div class="req-actions">
+        <button class="btn-decline" onclick="handleAction('cancel', this)">✗ Cancel Request</button>
+        <a href="item.html" class="btn-view">👁️ View Item</a>
+        <button class="btn-msg">💬 Follow Up</button>
+      </div>
+    </div>
+
+    <div class="request-card outgoing">
+      <div class="req-header">
+        <div class="req-user">
+          <div class="req-avatar" style="background:#2e7d32">S</div>
+          <div class="req-user-info">
+            <h4>Sent to: Siti Rahimah</h4>
+            <p>Penang · Sent 1 week ago</p>
+          </div>
+        </div>
+        <span class="req-status rs-accepted">Accepted ✓</span>
+      </div>
+      <div class="swap-items">
+        <div class="swap-item">
+          <div class="swap-item-img">🎮</div>
+          <div class="swap-item-info">
+            <h5>Your offer: PS4 Controller</h5>
+            <p>Electronics · RM 95 value</p>
+          </div>
+        </div>
+        <div class="swap-arrow">⇄</div>
+        <div class="swap-item">
+          <div class="swap-item-img">🎧</div>
+          <div class="swap-item-info">
+            <h5>Requesting: Sony Headphones</h5>
+            <p>Electronics · Good condition</p>
+          </div>
+        </div>
+      </div>
+      <div class="req-message">
+        <strong>Your message:</strong>
+        Hi! I have a PS4 controller in great condition. Would love to swap for your Sony headphones. Please let me know!
+      </div>
+      <div class="req-actions">
+        <button class="btn-accept" onclick="handleAction('complete', this)">✅ Mark as Completed</button>
+        <a href="item.html" class="btn-view">👁️ View Item</a>
+        <button class="btn-msg">💬 Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPLETED -->
+  <div class="tab-content" id="tab-completed">
+    <div class="request-card completed">
+      <div class="req-header">
+        <div class="req-user">
+          <div class="req-avatar" style="background:#5a7a63">A</div>
+          <div class="req-user-info">
+            <h4>Swapped with: Amirul</h4>
+            <p>Melaka · Completed 15 Dec 2025</p>
+          </div>
+        </div>
+        <span class="req-status rs-completed">Completed</span>
+      </div>
+      <div class="swap-items">
+        <div class="swap-item">
+          <div class="swap-item-img">🪑</div>
+          <div class="swap-item-info"><h5>Office Chair</h5><p>Furniture · Sold RM 120</p></div>
+        </div>
+        <div class="swap-arrow">💰</div>
+        <div class="swap-item">
+          <div class="swap-item-img">💵</div>
+          <div class="swap-item-info"><h5>Cash Payment</h5><p>RM 120 received</p></div>
+        </div>
+      </div>
+      <div class="req-actions">
+        <button class="btn-view" style="background:var(--green-pale);color:var(--green);border-color:var(--green-mid)">⭐ Leave Review</button>
+        <a href="item.html" class="btn-view">👁️ View Item</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  function switchTab(name, el) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    el.classList.add('active');
+  }
+
+  function showToast(msg, type='success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = (type === 'success' ? '✅ ' : '✗ ') + msg;
+    toast.className = 'toast ' + type + ' show';
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  function handleAction(action, btn) {
+    const card = btn.closest('.request-card');
+    const statusEl = card.querySelector('.req-status');
+    const actionsEl = card.querySelector('.req-actions');
+
+    if (action === 'accept') {
+      statusEl.textContent = 'Accepted ✓';
+      statusEl.className = 'req-status rs-accepted';
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      showToast('Swap request accepted!');
+    } else if (action === 'decline') {
+      statusEl.textContent = 'Declined';
+      statusEl.className = 'req-status rs-declined';
+      card.style.opacity = '0.6';
+      showToast('Request declined.', 'error');
+    } else if (action === 'cancel') {
+      card.style.opacity = '0.5';
+      showToast('Request cancelled.', 'error');
+    } else if (action === 'complete') {
+      statusEl.textContent = 'Completed ✓';
+      statusEl.className = 'req-status rs-completed';
+      showToast('Marked as completed! Great swap!');
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoSwap — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1a7a4a; --green-light: #25a863;
+      --green-pale: #e8f5ee; --green-mid: #b8dfc8;
+      --cream: #f9f6f0; --dark: #0f1f14;
+      --text: #1c2e20; --muted: #5a7a63;
+      --white: #ffffff;
+      --card-shadow: 0 4px 24px rgba(26,122,74,0.10);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); display: flex; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar { width: 240px; background: var(--dark); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-logo a { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--white); text-decoration: none; }
+    .sidebar-logo a span { color: var(--green-light); }
+    .sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
+    .nav-section { font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.1em; padding: 0 8px; margin-bottom: 8px; margin-top: 20px; }
+    .nav-section:first-child { margin-top: 0; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; color: rgba(255,255,255,0.65); font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.2s; text-decoration: none; margin-bottom: 2px; }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+    .nav-item.active { background: var(--green); color: var(--white); }
+    .nav-item .n-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .nav-item .n-badge { margin-left: auto; background: var(--green-light); color: var(--white); font-size: 0.68rem; font-weight: 700; padding: 2px 6px; border-radius: 8px; }
+    .sidebar-bottom { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 800; color: var(--white); flex-shrink: 0; }
+    .user-info h4 { font-size: 0.82rem; font-weight: 600; color: var(--white); }
+    .user-info p { font-size: 0.72rem; color: rgba(255,255,255,0.5); }
+    .logout-btn { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; color: rgba(255,255,255,0.5); font-size: 0.82rem; cursor: pointer; transition: all 0.2s; margin-top: 4px; border: none; background: transparent; width: 100%; font-family: 'DM Sans', sans-serif; }
+    .logout-btn:hover { background: rgba(255,0,0,0.1); color: #ff6b6b; }
+
+    /* MAIN */
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* TOP BAR */
+    .topbar { background: var(--white); border-bottom: 1px solid var(--green-mid); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar-left h1 { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--dark); }
+    .topbar-left p { font-size: 0.8rem; color: var(--muted); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .topbar-btn { width: 38px; height: 38px; border-radius: 9px; background: var(--cream); border: 1px solid var(--green-mid); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; transition: all 0.2s; position: relative; }
+    .topbar-btn:hover { background: var(--green-pale); border-color: var(--green); }
+    .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: #e53935; border: 2px solid var(--white); }
+    .post-btn { padding: 8px 18px; border-radius: 8px; background: var(--green); color: var(--white); border: none; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: background 0.2s; }
+    .post-btn:hover { background: var(--green-light); }
+
+    /* CONTENT */
+    .content { padding: 28px 32px; flex: 1; }
+
+    /* WELCOME BANNER */
+    .welcome-banner { background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%); border-radius: 16px; padding: 28px 32px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
+    .welcome-banner h2 { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--white); margin-bottom: 6px; }
+    .welcome-banner p { color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+    .welcome-banner .banner-btn { padding: 10px 22px; border-radius: 8px; background: rgba(255,255,255,0.2); color: var(--white); border: 1px solid rgba(255,255,255,0.3); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .welcome-banner .banner-btn:hover { background: rgba(255,255,255,0.3); }
+
+    /* STATS ROW */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: var(--white); border-radius: 14px; border: 1px solid var(--green-mid); padding: 20px; box-shadow: var(--card-shadow); display: flex; align-items: center; gap: 16px; }
+    .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+    .si-green { background: var(--green-pale); }
+    .si-blue { background: #e3f2fd; }
+    .si-amber { background: #fff8e1; }
+    .si-purple { background: #f3e5f5; }
+    .stat-info strong { display: block; font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--dark); line-height: 1; margin-bottom: 4px; }
+    .stat-info span { font-size: 0.78rem; color: var(--muted); }
+    .stat-change { margin-left: auto; font-size: 0.75rem; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
+    .up { background: var(--green-pale); color: var(--green); }
+    .pending { background: #fff8e1; color: #e65100; }
+
+    /* GRID 2 COL */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .grid-3-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+    /* CARDS */
+    .dash-card { background: var(--white); border-radius: 14px; border: 1px solid var(--green-mid); padding: 22px; box-shadow: var(--card-shadow); }
+    .dash-card h3 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .dash-card h3 a { font-size: 0.78rem; color: var(--green); text-decoration: none; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+
+    /* ACTIVITY FEED */
+    .activity-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--green-mid); }
+    .activity-item:last-child { border-bottom: none; }
+    .a-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .a-info p { font-size: 0.85rem; color: var(--text); margin-bottom: 2px; line-height: 1.4; }
+    .a-info span { font-size: 0.75rem; color: var(--muted); }
+
+    /* MINI LISTING */
+    .mini-listing { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--green-mid); }
+    .mini-listing:last-child { border-bottom: none; }
+    .ml-img { width: 44px; height: 44px; border-radius: 8px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .ml-info h4 { font-size: 0.85rem; font-weight: 600; color: var(--dark); margin-bottom: 2px; }
+    .ml-info p { font-size: 0.75rem; color: var(--muted); }
+    .ml-status { margin-left: auto; padding: 3px 9px; border-radius: 5px; font-size: 0.72rem; font-weight: 700; flex-shrink: 0; }
+    .s-active { background: var(--green-pale); color: var(--green); }
+    .s-pending { background: #fff3e0; color: #e65100; }
+    .s-sold { background: #f3e5f5; color: #7b1fa2; }
+
+    /* CHART BAR (CSS only) */
+    .chart-wrap { display: flex; align-items: flex-end; gap: 8px; height: 120px; margin-bottom: 8px; }
+    .bar-group { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; height: 100%; justify-content: flex-end; }
+    .bar { width: 100%; border-radius: 6px 6px 0 0; background: var(--green-pale); transition: height 0.5s ease; cursor: pointer; position: relative; }
+    .bar:hover { background: var(--green); }
+    .bar-label { font-size: 0.7rem; color: var(--muted); text-align: center; }
+    .chart-labels { display: flex; gap: 8px; }
+    .chart-labels span { flex: 1; text-align: center; font-size: 0.7rem; color: var(--muted); }
+
+    /* ECO IMPACT */
+    .eco-row { display: flex; flex-direction: column; gap: 14px; }
+    .eco-item { display: flex; align-items: center; gap: 12px; }
+    .eco-icon { font-size: 1.2rem; width: 32px; text-align: center; flex-shrink: 0; }
+    .eco-label { font-size: 0.82rem; color: var(--text); flex: 1; }
+    .eco-val { font-family: 'Syne', sans-serif; font-size: 0.88rem; font-weight: 700; color: var(--green); white-space: nowrap; }
+    .eco-bar-wrap { width: 100%; height: 6px; background: var(--green-mid); border-radius: 3px; margin-top: 4px; }
+    .eco-bar-fill { height: 100%; background: var(--green); border-radius: 3px; }
+
+    /* REQUESTS MINI */
+    .req-mini { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--green-mid); }
+    .req-mini:last-child { border-bottom: none; }
+    .req-mini-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 800; color: var(--white); flex-shrink: 0; }
+    .req-mini-info h4 { font-size: 0.83rem; font-weight: 600; color: var(--dark); margin-bottom: 2px; }
+    .req-mini-info p { font-size: 0.75rem; color: var(--muted); }
+    .req-mini-actions { margin-left: auto; display: flex; gap: 6px; }
+    .req-mini-actions button { padding: 5px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+    .btn-acc { background: var(--green-pale); color: var(--green); border: 1px solid var(--green-mid); }
+    .btn-acc:hover { background: var(--green); color: var(--white); }
+    .btn-dec { background: #fdecea; color: #c62828; border: 1px solid #ef9a9a; }
+    .btn-dec:hover { background: #c62828; color: var(--white); }
+
+    @media (max-width: 1100px) { .stats-row { grid-template-columns: repeat(2,1fr); } .grid-3-1 { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } .grid-2 { grid-template-columns: 1fr; } .stats-row { grid-template-columns: repeat(2,1fr); } }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html">Eco<span>Swap</span></a>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <a href="dashboard.html" class="nav-item active"><span class="n-icon">📊</span> Dashboard</a>
+    <a href="browse.html" class="nav-item"><span class="n-icon">🔍</span> Browse</a>
+    <a href="map.html" class="nav-item"><span class="n-icon">🗺️</span> Map View</a>
+    <a href="post.html" class="nav-item"><span class="n-icon">➕</span> Post Item</a>
+
+    <div class="nav-section">My Account</div>
+    <a href="profile.html" class="nav-item"><span class="n-icon">👤</span> Profile</a>
+    <a href="requests.html" class="nav-item"><span class="n-icon">🔄</span> Requests <span class="n-badge">3</span></a>
+    <a href="checkout.html" class="nav-item"><span class="n-icon">💳</span> Checkout</a>
+
+    <div class="nav-section">Info</div>
+    <a href="about.html" class="nav-item"><span class="n-icon">🌍</span> About & SDG9</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">B</div>
+      <div class="user-info">
+        <h4>Bashiir Mohamed</h4>
+        <p>Muar, Johor</p>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="window.location.href='login.html'">🚪 Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Dashboard</h1>
+      <p>Sunday, 7 June 2026</p>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-btn">🔔<span class="notif-dot"></span></div>
+      <div class="topbar-btn">⚙️</div>
+      <a href="post.html" class="post-btn">+ Post Item</a>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- WELCOME -->
+    <div class="welcome-banner">
+      <div>
+        <h2>Welcome back, Bashiir 👋</h2>
+        <p>You have 3 pending swap requests and 2 active listings getting attention.</p>
+      </div>
+      <a href="requests.html" class="banner-btn">View Requests →</a>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon si-green">📦</div>
+        <div class="stat-info"><strong>8</strong><span>Active Listings</span></div>
+        <span class="stat-change up">+2</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon si-blue">🔄</div>
+        <div class="stat-info"><strong>12</strong><span>Total Swaps</span></div>
+        <span class="stat-change up">+3</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon si-amber">📨</div>
+        <div class="stat-info"><strong>3</strong><span>Pending Requests</span></div>
+        <span class="stat-change pending">New</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon si-purple">👁️</div>
+        <div class="stat-info"><strong>247</strong><span>Profile Views</span></div>
+        <span class="stat-change up">+18</span>
+      </div>
+    </div>
+
+    <!-- CHART + ECO -->
+    <div class="grid-3-1">
+      <div class="dash-card">
+        <h3>Listing Views — Last 7 Days <a href="#">See all</a></h3>
+        <div class="chart-wrap" id="chartWrap"></div>
+        <div class="chart-labels" id="chartLabels"></div>
+      </div>
+      <div class="dash-card">
+        <h3>🌱 Eco Impact</h3>
+        <div class="eco-row">
+          <div class="eco-item">
+            <span class="eco-icon">🌿</span>
+            <div style="flex:1">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span class="eco-label">CO₂ Saved</span>
+                <span class="eco-val">14.2 kg</span>
+              </div>
+              <div class="eco-bar-wrap"><div class="eco-bar-fill" style="width:71%"></div></div>
+            </div>
+          </div>
+          <div class="eco-item">
+            <span class="eco-icon">📦</span>
+            <div style="flex:1">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span class="eco-label">Items Diverted</span>
+                <span class="eco-val">12</span>
+              </div>
+              <div class="eco-bar-wrap"><div class="eco-bar-fill" style="width:60%"></div></div>
+            </div>
+          </div>
+          <div class="eco-item">
+            <span class="eco-icon">💧</span>
+            <div style="flex:1">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span class="eco-label">Water Saved</span>
+                <span class="eco-val">8,600L</span>
+              </div>
+              <div class="eco-bar-wrap"><div class="eco-bar-fill" style="width:43%"></div></div>
+            </div>
+          </div>
+          <div class="eco-item">
+            <span class="eco-icon">🔋</span>
+            <div style="flex:1">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span class="eco-label">Energy Saved</span>
+                <span class="eco-val">4,200 kWh</span>
+              </div>
+              <div class="eco-bar-wrap"><div class="eco-bar-fill" style="width:55%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LISTINGS + REQUESTS -->
+    <div class="grid-2">
+      <div class="dash-card">
+        <h3>My Listings <a href="profile.html">View all</a></h3>
+        <div class="mini-listing">
+          <div class="ml-img">📱</div>
+          <div class="ml-info"><h4>Samsung Galaxy Tab A8</h4><p>Electronics · 47 views</p></div>
+          <span class="ml-status s-active">Active</span>
+        </div>
+        <div class="mini-listing">
+          <div class="ml-img">🚲</div>
+          <div class="ml-info"><h4>Mountain Bicycle</h4><p>Sports · 89 views</p></div>
+          <span class="ml-status s-pending">3 Requests</span>
+        </div>
+        <div class="mini-listing">
+          <div class="ml-img">📚</div>
+          <div class="ml-info"><h4>Engineering Textbooks</h4><p>Books · 31 views</p></div>
+          <span class="ml-status s-active">Active</span>
+        </div>
+        <div class="mini-listing">
+          <div class="ml-img">🪑</div>
+          <div class="ml-info"><h4>Office Chair</h4><p>Furniture · 55 views</p></div>
+          <span class="ml-status s-sold">Sold</span>
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <h3>Pending Requests <a href="requests.html">View all</a></h3>
+        <div class="req-mini">
+          <div class="req-mini-avatar">F</div>
+          <div class="req-mini-info"><h4>Ahmad Faiz wants your Bicycle</h4><p>Offering: Acoustic Guitar · 2h ago</p></div>
+          <div class="req-mini-actions">
+            <button class="btn-acc" onclick="quickAction(this,'accepted')">✓</button>
+            <button class="btn-dec" onclick="quickAction(this,'declined')">✗</button>
+          </div>
+        </div>
+        <div class="req-mini">
+          <div class="req-mini-avatar" style="background:#9c27b0">N</div>
+          <div class="req-mini-info"><h4>Nurul wants your Samsung Tab</h4><p>Offering: Laptop Stand + RM50 · 5h ago</p></div>
+          <div class="req-mini-actions">
+            <button class="btn-acc" onclick="quickAction(this,'accepted')">✓</button>
+            <button class="btn-dec" onclick="quickAction(this,'declined')">✗</button>
+          </div>
+        </div>
+        <div class="req-mini">
+          <div class="req-mini-avatar" style="background:#e65100">R</div>
+          <div class="req-mini-info"><h4>Rauf wants your Textbooks</h4><p>Offering: Harry Potter Set · Yesterday</p></div>
+          <div class="req-mini-actions">
+            <button class="btn-acc" onclick="quickAction(this,'accepted')">✓</button>
+            <button class="btn-dec" onclick="quickAction(this,'declined')">✗</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div class="dash-card">
+      <h3>Recent Activity <a href="#">See all</a></h3>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0 24px">
+        <div class="activity-item">
+          <div class="a-icon">📨</div>
+          <div class="a-info"><p>Ahmad Faiz sent a swap request for your <strong>Mountain Bicycle</strong></p><span>2 hours ago</span></div>
+        </div>
+        <div class="activity-item">
+          <div class="a-icon">👁️</div>
+          <div class="a-info"><p>Your <strong>Samsung Tab A8</strong> got 12 new views today</p><span>3 hours ago</span></div>
+        </div>
+        <div class="activity-item">
+          <div class="a-icon">✅</div>
+          <div class="a-info"><p>Your swap with <strong>Siti Rahimah</strong> was marked complete</p><span>Yesterday</span></div>
+        </div>
+        <div class="activity-item">
+          <div class="a-icon">💰</div>
+          <div class="a-info"><p>Office Chair sold for <strong>RM 120</strong> to Amirul</p><span>2 days ago</span></div>
+        </div>
+        <div class="activity-item">
+          <div class="a-icon">⭐</div>
+          <div class="a-info"><p>You received a 5-star review from <strong>Ahmad Faiz</strong></p><span>3 days ago</span></div>
+        </div>
+        <div class="activity-item">
+          <div class="a-icon">📦</div>
+          <div class="a-info"><p>You posted a new listing: <strong>Nike Running Shoes</strong></p><span>4 days ago</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Draw CSS bar chart
+  const data = [28, 45, 32, 61, 47, 53, 38];
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const max = Math.max(...data);
+  const wrap = document.getElementById('chartWrap');
+  const labels = document.getElementById('chartLabels');
+  data.forEach((val, i) => {
+    const pct = (val / max) * 100;
+    const grp = document.createElement('div');
+    grp.className = 'bar-group';
+    grp.innerHTML = `<div style="font-size:0.68rem;color:var(--muted);margin-bottom:2px">${val}</div><div class="bar" style="height:${pct}%" title="${val} views on ${days[i]}"></div>`;
+    wrap.appendChild(grp);
+    const lbl = document.createElement('span');
+    lbl.textContent = days[i];
+    labels.appendChild(lbl);
+  });
+
+  function quickAction(btn, action) {
+    const row = btn.closest('.req-mini');
+    const actionsDiv = row.querySelector('.req-mini-actions');
+    if (action === 'accepted') {
+      actionsDiv.innerHTML = '<span style="font-size:0.75rem;color:var(--green);font-weight:600">✅ Accepted</span>';
+    } else {
+      actionsDiv.innerHTML = '<span style="font-size:0.75rem;color:#c62828;font-weight:600">✗ Declined</span>';
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoSwap — Checkout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1a7a4a; --green-light: #25a863;
+      --green-pale: #e8f5ee; --green-mid: #b8dfc8;
+      --cream: #f9f6f0; --dark: #0f1f14;
+      --text: #1c2e20; --muted: #5a7a63;
+      --white: #ffffff;
+      --card-shadow: 0 4px 24px rgba(26,122,74,0.10);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+    nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 68px; background: rgba(249,246,240,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--green-mid); }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--green); text-decoration: none; }
+    .nav-logo span { color: var(--green-light); }
+
+    /* STEPS */
+    .steps-bar { background: var(--white); border-bottom: 1px solid var(--green-mid); padding: 20px 5%; }
+    .steps { display: flex; align-items: center; max-width: 500px; margin: 0 auto; }
+    .step { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .step-num { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 700; flex-shrink: 0; transition: all 0.3s; }
+    .step.done .step-num { background: var(--green); color: var(--white); }
+    .step.active .step-num { background: var(--green); color: var(--white); box-shadow: 0 0 0 4px rgba(26,122,74,0.2); }
+    .step.inactive .step-num { background: var(--green-pale); color: var(--muted); border: 2px solid var(--green-mid); }
+    .step-label { font-size: 0.82rem; font-weight: 500; color: var(--muted); }
+    .step.active .step-label { color: var(--green); font-weight: 600; }
+    .step-line { flex: 1; height: 2px; background: var(--green-mid); margin: 0 8px; }
+    .step-line.done { background: var(--green); }
+
+    /* LAYOUT */
+    .checkout-layout { display: grid; grid-template-columns: 1fr 380px; gap: 32px; padding: 40px 5%; max-width: 1100px; margin: 0 auto; }
+
+    /* FORM CARD */
+    .form-card { background: var(--white); border-radius: 16px; border: 1px solid var(--green-mid); padding: 28px; box-shadow: var(--card-shadow); margin-bottom: 20px; }
+    .form-card h2 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--green-mid); display: flex; align-items: center; gap: 8px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 7px; }
+    .form-group input, .form-group select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--green-mid); border-radius: 10px; outline: none; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--text); background: var(--cream); transition: border-color 0.2s, box-shadow 0.2s; }
+    .form-group input:focus, .form-group select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(26,122,74,0.1); background: var(--white); }
+
+    /* STRIPE ELEMENT */
+    .stripe-field { padding: 12px 14px; border: 1.5px solid var(--green-mid); border-radius: 10px; background: var(--cream); transition: border-color 0.2s; }
+    .stripe-field.focused { border-color: var(--green); box-shadow: 0 0 0 3px rgba(26,122,74,0.1); background: var(--white); }
+    .card-icons { display: flex; gap: 8px; margin-bottom: 12px; }
+    .card-icon { padding: 4px 10px; border-radius: 5px; background: var(--green-pale); border: 1px solid var(--green-mid); font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+    .secure-note { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--muted); margin-top: 12px; }
+    .test-card-info { background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.82rem; color: #5d4037; }
+    .test-card-info strong { display: block; margin-bottom: 4px; color: #e65100; }
+
+    /* PAYMENT METHOD TABS */
+    .payment-methods { display: flex; gap: 8px; margin-bottom: 20px; }
+    .pm-btn { flex: 1; padding: 10px; border-radius: 10px; border: 1.5px solid var(--green-mid); background: var(--white); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; color: var(--muted); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .pm-btn.active { border-color: var(--green); background: var(--green-pale); color: var(--green); font-weight: 600; }
+    .pm-btn:hover:not(.active) { border-color: var(--green); }
+
+    /* ORDER SUMMARY */
+    .order-summary { position: sticky; top: 88px; }
+    .summary-card { background: var(--white); border-radius: 16px; border: 1px solid var(--green-mid); padding: 24px; box-shadow: var(--card-shadow); margin-bottom: 16px; }
+    .summary-card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 20px; }
+    .summary-item { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--green-mid); }
+    .summary-item-img { width: 60px; height: 60px; border-radius: 10px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; border: 1px solid var(--green-mid); }
+    .summary-item-info h4 { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+    .summary-item-info p { font-size: 0.78rem; color: var(--muted); }
+    .summary-rows { margin-bottom: 16px; }
+    .summary-row { display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 10px; color: var(--text); }
+    .summary-row.muted { color: var(--muted); }
+    .summary-row.total { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 800; color: var(--dark); border-top: 1px solid var(--green-mid); padding-top: 12px; margin-top: 4px; }
+    .summary-row span:last-child { font-weight: 600; }
+    .summary-row.total span:last-child { color: var(--green); font-size: 1.1rem; }
+
+    /* PAY BUTTON */
+    .pay-btn { width: 100%; padding: 15px; border-radius: 12px; background: var(--green); color: var(--white); border: none; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
+    .pay-btn:hover { background: var(--green-light); }
+    .pay-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+    .pay-guarantee { text-align: center; font-size: 0.78rem; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 4px; }
+
+    /* PROMO */
+    .promo-row { display: flex; gap: 8px; margin-top: 16px; }
+    .promo-row input { flex: 1; padding: 10px 14px; border: 1.5px solid var(--green-mid); border-radius: 8px; outline: none; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; color: var(--text); background: var(--cream); }
+    .promo-row input:focus { border-color: var(--green); }
+    .promo-btn { padding: 10px 18px; border-radius: 8px; background: var(--green-pale); color: var(--green); border: 1.5px solid var(--green-mid); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .promo-btn:hover { background: var(--green); color: var(--white); }
+
+    /* SUCCESS */
+    .success-screen { display: none; text-align: center; padding: 60px 5%; max-width: 560px; margin: 0 auto; }
+    .success-screen.show { display: block; }
+    .checkout-layout.hide { display: none; }
+    .success-icon-wrap { width: 90px; height: 90px; border-radius: 50%; background: var(--green-pale); border: 3px solid var(--green); display: flex; align-items: center; justify-content: center; font-size: 2.8rem; margin: 0 auto 24px; }
+    .success-screen h2 { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--dark); margin-bottom: 10px; }
+    .success-screen p { color: var(--muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 32px; }
+    .success-details { background: var(--white); border-radius: 14px; border: 1px solid var(--green-mid); padding: 20px; margin-bottom: 28px; text-align: left; }
+    .success-detail-row { display: flex; justify-content: space-between; font-size: 0.88rem; padding: 8px 0; border-bottom: 1px solid var(--green-mid); }
+    .success-detail-row:last-child { border-bottom: none; }
+    .success-detail-row span:first-child { color: var(--muted); }
+    .success-detail-row span:last-child { font-weight: 600; color: var(--dark); }
+    .success-btns { display: flex; gap: 12px; }
+    .success-btns a { flex: 1; padding: 12px; border-radius: 10px; text-decoration: none; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; font-weight: 600; text-align: center; }
+    .s-home { background: var(--green); color: var(--white); }
+    .s-profile { background: var(--white); color: var(--green); border: 1.5px solid var(--green); }
+
+    #payment-error { color: #c62828; font-size: 0.85rem; margin-top: 8px; display: none; }
+
+    @media (max-width: 900px) { .checkout-layout { grid-template-columns: 1fr; } .order-summary { position: static; } .nav-links { display: none; } }
+    @media (max-width: 480px) { .form-row-2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Eco<span>Swap</span></a>
+</nav>
+
+<div class="steps-bar">
+  <div class="steps">
+    <div class="step done"><div class="step-num">✓</div><div class="step-label">Cart</div></div>
+    <div class="step-line done"></div>
+    <div class="step active"><div class="step-num">2</div><div class="step-label">Checkout</div></div>
+    <div class="step-line"></div>
+    <div class="step inactive"><div class="step-num">3</div><div class="step-label">Confirmation</div></div>
+  </div>
+</div>
+
+<!-- SUCCESS SCREEN -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon-wrap">🎉</div>
+  <h2>Payment Successful!</h2>
+  <p>Your order has been placed and the seller has been notified. You'll receive a confirmation email shortly.</p>
+  <div class="success-details">
+    <div class="success-detail-row"><span>Order ID</span><span id="orderId">#ECO-2026-0001</span></div>
+    <div class="success-detail-row"><span>Item</span><span>Mountain Bicycle</span></div>
+    <div class="success-detail-row"><span>Amount Paid</span><span>RM 360.50</span></div>
+    <div class="success-detail-row"><span>Payment Method</span><span>Visa •••• 4242</span></div>
+    <div class="success-detail-row"><span>Status</span><span style="color:var(--green)">✅ Confirmed</span></div>
+  </div>
+  <div class="success-btns">
+    <a href="index.html" class="s-home">Back to Home</a>
+    <a href="profile.html" class="s-profile">My Orders</a>
+  </div>
+</div>
+
+<!-- CHECKOUT LAYOUT -->
+<div class="checkout-layout" id="checkoutLayout">
+  <div>
+    <!-- SHIPPING -->
+    <div class="form-card">
+      <h2>📍 Shipping / Meetup Details</h2>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" placeholder="Ahmad" value="Bashiir" />
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" placeholder="Bashir" value="Mohamed" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" placeholder="+60 12-345 6789" value="+60 12-345 6789" />
+      </div>
+      <div class="form-group">
+        <label>Delivery Method</label>
+        <select id="deliveryMethod" onchange="updateDelivery()">
+          <option value="meetup">Meet Up in Person (Free)</option>
+          <option value="poslaju">Pos Laju Delivery (+RM 10)</option>
+          <option value="jnt">J&T Express (+RM 8)</option>
+        </select>
+      </div>
+      <div id="addressFields" style="display:none">
+        <div class="form-group">
+          <label>Street Address</label>
+          <input type="text" placeholder="No. 12, Jalan Maju..." />
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" placeholder="Muar" />
+          </div>
+          <div class="form-group">
+            <label>Postcode</label>
+            <input type="text" placeholder="84000" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>State</label>
+          <select>
+            <option>Johor</option><option>Selangor</option><option>Kuala Lumpur</option>
+            <option>Penang</option><option>Perak</option><option>Melaka</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENT -->
+    <div class="form-card">
+      <h2>💳 Payment Details</h2>
+
+      <div class="payment-methods">
+        <button class="pm-btn active" onclick="selectPM(this)">💳 Card</button>
+        <button class="pm-btn" onclick="selectPM(this)">🏦 Online Banking</button>
+        <button class="pm-btn" onclick="selectPM(this)">📱 e-Wallet</button>
+      </div>
+
+      <div class="test-card-info">
+        <strong>🧪 Sandbox / Test Mode</strong>
+        Use test card: <strong>4242 4242 4242 4242</strong> · Any future date · Any 3-digit CVC
+      </div>
+
+      <div class="card-icons">
+        <span class="card-icon">VISA</span>
+        <span class="card-icon">MC</span>
+        <span class="card-icon">AMEX</span>
+        <span class="card-icon">JCB</span>
+      </div>
+
+      <div class="form-group">
+        <label>Cardholder Name</label>
+        <input type="text" id="cardName" placeholder="Name as on card" value="BASHIIR MOHAMED" />
+      </div>
+
+      <div class="form-group">
+        <label>Card Number</label>
+        <div id="card-element" class="stripe-field">
+          <!-- Stripe Element mounts here -->
+        </div>
+      </div>
+
+      <div id="payment-error"></div>
+
+      <div class="secure-note">
+        🔒 Your payment is secured by Stripe. EcoSwap never stores your card details.
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER SUMMARY -->
+  <div class="order-summary">
+    <div class="summary-card">
+      <h3>Order Summary</h3>
+      <div class="summary-item">
+        <div class="summary-item-img">🚲</div>
+        <div class="summary-item-info">
+          <h4>Mountain Bicycle</h4>
+          <p>Seller: Ahmad · Muar, Johor</p>
+        </div>
+      </div>
+      <div class="summary-rows">
+        <div class="summary-row muted"><span>Item Price</span><span>RM 350.00</span></div>
+        <div class="summary-row muted"><span id="shippingLabel">Meetup Fee</span><span id="shippingCost">Free</span></div>
+        <div class="summary-row muted"><span>Platform Fee (3%)</span><span>RM 10.50</span></div>
+        <div class="summary-row total"><span>Total</span><span id="totalAmount">RM 360.50</span></div>
+      </div>
+      <div class="promo-row">
+        <input type="text" placeholder="Promo code" id="promoInput" />
+        <button class="promo-btn" onclick="applyPromo()">Apply</button>
+      </div>
+    </div>
+
+    <button class="pay-btn" id="payBtn" onclick="handlePayment()">
+      🔒 Pay <span id="payBtnAmount">RM 360.50</span>
+    </button>
+    <p class="pay-guarantee">🌱 Secure payment · 100% buyer protection</p>
+  </div>
+</div>
+
+<script>
+  // Stripe init — replace with your real publishable key from stripe.com dashboard
+  const stripe = Stripe('pk_test_51000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000');
+  const elements = stripe.elements();
+  const cardElement = elements.create('card', {
+    style: {
+      base: { fontFamily: 'DM Sans, sans-serif', fontSize: '15px', color: '#1c2e20', '::placeholder': { color: '#5a7a63' } },
+      invalid: { color: '#c62828' }
+    }
+  });
+  cardElement.mount('#card-element');
+  cardElement.on('focus', () => document.getElementById('card-element').classList.add('focused'));
+  cardElement.on('blur', () => document.getElementById('card-element').classList.remove('focused'));
+
+  function selectPM(btn) {
+    document.querySelectorAll('.pm-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function updateDelivery() {
+    const method = document.getElementById('deliveryMethod').value;
+    const addressFields = document.getElementById('addressFields');
+    const shippingLabel = document.getElementById('shippingLabel');
+    const shippingCost = document.getElementById('shippingCost');
+    const totalAmount = document.getElementById('totalAmount');
+    const payBtnAmount = document.getElementById('payBtnAmount');
+
+    if (method === 'meetup') {
+      addressFields.style.display = 'none';
+      shippingLabel.textContent = 'Meetup Fee';
+      shippingCost.textContent = 'Free';
+      totalAmount.textContent = 'RM 360.50';
+      payBtnAmount.textContent = 'RM 360.50';
+    } else if (method === 'poslaju') {
+      addressFields.style.display = 'block';
+      shippingLabel.textContent = 'Pos Laju';
+      shippingCost.textContent = 'RM 10.00';
+      totalAmount.textContent = 'RM 370.50';
+      payBtnAmount.textContent = 'RM 370.50';
+    } else {
+      addressFields.style.display = 'block';
+      shippingLabel.textContent = 'J&T Express';
+      shippingCost.textContent = 'RM 8.00';
+      totalAmount.textContent = 'RM 368.50';
+      payBtnAmount.textContent = 'RM 368.50';
+    }
+  }
+
+  function applyPromo() {
+    const code = document.getElementById('promoInput').value.trim().toUpperCase();
+    if (code === 'ECO10') {
+      alert('✅ Promo code applied! 10% discount added.');
+    } else {
+      alert('❌ Invalid promo code.');
+    }
+  }
+
+  async function handlePayment() {
+    const btn = document.getElementById('payBtn');
+    const errorEl = document.getElementById('payment-error');
+    btn.disabled = true;
+    btn.textContent = '⏳ Processing...';
+    errorEl.style.display = 'none';
+
+    // In production this creates a PaymentIntent on your backend
+    // For sandbox demo we simulate the flow directly
+    const { paymentMethod, error } = await stripe.createPaymentMethod({
+      type: 'card',
+      card: cardElement,
+      billing_details: { name: document.getElementById('cardName').value }
+    });
+
+    if (error) {
+      errorEl.textContent = error.message;
+      errorEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = '🔒 Pay <span id="payBtnAmount">' + document.getElementById('totalAmount').textContent + '</span>';
+    } else {
+      // Payment method created successfully — show success screen
+      document.getElementById('orderId').textContent = '#ECO-2026-' + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('checkoutLayout').classList.add('hide');
+      document.getElementById('successScreen').classList.add('show');
+      window.scrollTo(0, 0);
+    }
+  }
+</script>
+
+</body>
+</html>
